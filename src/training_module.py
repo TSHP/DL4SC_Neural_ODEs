@@ -32,6 +32,8 @@ class TrainingModule:
 
         self.criterion = nn.CrossEntropyLoss()
 
+        print(f"Number of parameters: {self.model.get_num_params()}")
+
     def fit(self, num_epochs: int = 100):
         total_steps = len(self.training_dataloader)
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
@@ -65,6 +67,7 @@ class TrainingModule:
 
         print(f'Error of the network on test MNIST: {100 * total_incorrect / total}%')
         print(f'Loss of the network on test MNIST: {running_loss / len(self.test_dataloader)}%')
+        print(f"Number of parameters: {self.model.get_num_params()}")
 
 
 

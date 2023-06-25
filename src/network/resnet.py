@@ -1,11 +1,7 @@
 import torch.nn as nn
 
-def norm(dim):
-    return nn.GroupNorm(min(32, dim), dim)
+from src.network.model_utils import norm, conv3x3
 
-def conv3x3(in_planes, out_planes, stride=1):
-    """3x3 convolution with padding"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
 
 class ResBlock(nn.Module):
     expansion = 1
@@ -60,6 +56,9 @@ class ResNet(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.norm = norm(64)
         self.fc = nn.Linear(64, out_dim)
+
+    def get_num_params(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
         out = self.downsampling_layer(x)

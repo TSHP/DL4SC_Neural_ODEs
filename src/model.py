@@ -17,17 +17,11 @@ def model_factory(params):
         )
     elif params["network_name"] == "rknet":
         return RKNet(
-            in_dim=params["in_dim"],
-            out_dim=params["out_dim"],
-            hidden_dim=params["hidden_dim"],
-            num_hidden=params["num_hidden"],
+            out_dim=params["out_dim"]
         )
     elif params["network_name"] == "odenet":
         return ODENet(
-            in_dim=params["in_dim"],
-            out_dim=params["out_dim"],
-            hidden_dim=params["hidden_dim"],
-            num_hidden=params["num_hidden"],
+            out_dim=params["out_dim"]
         )
     else:
         raise ValueError("Invalid network name")

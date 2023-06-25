@@ -8,7 +8,8 @@ class SLMLP(nn.Module):
         self.linear = nn.Linear(hidden_dim, out_dim)
         self.Relu = nn.ReLU()
 
-        print("Num params: ", sum(p.numel() for p in self.parameters() if p.requires_grad))
+    def get_num_params(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
         x = x.reshape(-1, 28*28)
