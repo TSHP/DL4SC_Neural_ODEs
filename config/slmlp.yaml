@@ -1,12 +1,13 @@
 experiment:
   model:
-    network_name: mlp
+    network_name: slmlp
     in_dim: 784
     out_dim: 10
+    hidden_dim: 300
   
   training:
-    n_epochs: 10
-    batch_size: 64
+    n_epochs: 30
+    batch_size: 128
 
   optimizer:
     optimizer_name: adam

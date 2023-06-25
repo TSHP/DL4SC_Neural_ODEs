@@ -15,29 +15,28 @@ class TrainingModule:
 
         self.batch_size = params["batch_size"]
 
+        #self.mnist = torchvision.datasets.MNIST(root=INPUT_DIR, train=True,
+        #                            download=True, transform=torchvision.transforms.ToTensor())
         self.training_dataset = torchvision.datasets.MNIST(root=INPUT_DIR, train=True,
-                                    download=True, transform=torchvision.transforms.ToTensor()) # Might need to normalize
-        self.training_dataloader = torch.utils.data.DataLoader(self.training_dataset, batch_size=self.batch_size,
-                                      shuffle=True)
-        
-        self.training_dataset = torchvision.datasets.MNIST(root=INPUT_DIR, train=True,
-                                    download=True, transform=torchvision.transforms.ToTensor()) # Might need to normalize
-        self.training_dataloader = torch.utils.data.DataLoader(self.training_dataset, batch_size=self.batch_size,
-                                      shuffle=True)
-        
+                                    download=True, transform=torchvision.transforms.ToTensor())
+        #self.training_dataset, self.validation_dataset = torch.utils.data.random_split(self.mnist, [50000, 10000])
         self.test_dataset = torchvision.datasets.MNIST(root=INPUT_DIR, train=False,
-                                    download=True, transform=torchvision.transforms.ToTensor()) # Might need to normalize
+                                    download=True, transform=torchvision.transforms.ToTensor())
+        
+        self.training_dataloader = torch.utils.data.DataLoader(self.training_dataset, batch_size=self.batch_size,
+                                      shuffle=True)
+        #self.validation_dataloader = torch.utils.data.DataLoader(self.validation_dataset, batch_size=self.batch_size,
+        #                              shuffle=False)
         self.test_dataloader = torch.utils.data.DataLoader(self.test_dataset, batch_size=self.batch_size,
                                       shuffle=False)
 
         self.criterion = nn.CrossEntropyLoss()
 
-    def fit(self, num_epochs: int = 10):
+    def fit(self, num_epochs: int = 100):
         total_steps = len(self.training_dataloader)
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
             running_loss = 0.0
             for i, (images, labels) in (pbar := tqdm(enumerate(self.training_dataloader))):
-                images = images.reshape(-1, 28*28)
                 out = self.model(images)
                 loss = self.criterion(out, labels)
                 running_loss += loss.item()
@@ -46,24 +45,26 @@ class TrainingModule:
                 loss.backward()
                 self.optimizer.step()
 
-                pbar.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Step[{i + 1}/{total_steps}], Losses: {loss.item():.4f}') 
-            pbar_epoch.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Running Loss: {running_loss:.4f}')      
+                pbar.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Step[{i + 1}/{total_steps}], Loss: {loss.item():.4f}') 
+            pbar_epoch.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Running Loss: {running_loss / len(self.training_dataloader):.4f}')      
 
     def eval(self):
-        total_correct = 0
+        total_incorrect = 0
         total = 0
+        running_loss = 0.0
         with torch.no_grad():
-            for i, (images, labels) in enumerate(self.test_dataloader):
-                images = images.reshape(-1, 28*28)
+            for _, (images, labels) in enumerate(self.test_dataloader):
                 out = self.model(images)
                 loss = self.criterion(out, labels)
+                running_loss += loss.item()
 
                 _, predicted = torch.max(out.data, 1)
-                total_correct += (predicted == labels).sum().item()
+                total_incorrect += (predicted != labels).sum().item()
                 total += labels.size(0)
 
 
-        print(f'Accuracy of the network on test MNIST: {100 * total_correct / total}%')
+        print(f'Error of the network on test MNIST: {100 * total_incorrect / total}%')
+        print(f'Loss of the network on test MNIST: {running_loss / len(self.test_dataloader)}%')
 
 
 
