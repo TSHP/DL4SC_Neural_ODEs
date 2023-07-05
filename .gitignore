@@ -1,3 +1,6 @@
+# data set
+Image_segmentation/src/Data/data_set
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

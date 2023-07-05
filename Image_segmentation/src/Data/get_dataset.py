@@ -6,6 +6,7 @@ import pathlib
 def download_VOC():
     # Set the root directory where you want to download the dataset
     root = pathlib.Path(__file__).parent.resolve()
+    root = root / "data_set"
     year = "2012"
 
     # Download the VOC dataset
