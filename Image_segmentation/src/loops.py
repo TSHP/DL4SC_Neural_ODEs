@@ -36,7 +36,7 @@ class ModelTrainer:
                 # Print the running loss every 'print_interval' evaluations
                 if eval_counter % self.print_int == 0:
                     average_loss = running_loss / self.print_int
-                    print(f"Epoch [{epoch+1}/{self.print_int}], Evaluation [{i}/{len(self.train_loader)}], Loss: {average_loss}")
+                    print(f"Epoch [{epoch+1}/{self.epochs}], Evaluation [{i}/{len(self.train_loader)}], Loss: {average_loss}")
                     running_loss = 0.0
                     eval_counter = 0
 
