@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from torchvision.transforms import ToPILImage
 from torchvision.utils import make_grid
+import torch
 
 def visualize_dataset(voc_dataset, num=5):
     # Iterate over the first 5 samples in the dataset
@@ -60,3 +61,30 @@ def visualize_dataloader(VOC_data_loader):
     plt.show()
     print("images shape: ", images.shape)
     print("masks shape: ", masks.shape)
+
+def visualize_results(predicts, masks):
+    
+    predicts = torch.tensor(predicts[0])
+    masks = torch.tensor(masks[0])
+    
+    # Create a grid of images for visualization
+    grid_images = make_grid(predicts)
+    grid_masks = make_grid(masks)
+
+    # Convert tensors to numpy arrays
+    grid_images_np = grid_images.numpy().transpose(1, 2, 0)
+    grid_masks_np = grid_masks.numpy().transpose(1, 2, 0)
+
+    # Display the grid of images and masks
+    plt.subplot(1, 2, 1)
+    plt.imshow(grid_images_np)
+    plt.title("Predictions")
+    plt.axis("off")
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(grid_masks_np[:, :, 0])
+    plt.title("Masks")
+    plt.axis("off")
+
+    plt.tight_layout()
+    plt.show()

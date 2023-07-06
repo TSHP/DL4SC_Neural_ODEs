@@ -55,4 +55,18 @@ class ModelTrainer:
                 running_loss += loss.item()
 
         final_loss = running_loss / len(self.test_loader)
-        print(f"Test Accuracy: {final_loss:.2f}%")
+        print(f"Test avg dice loss: {final_loss:.2f}%")
+        
+    def predict(self, dataloader=None):
+        if dataloader is None:
+            dataloader = self.test_loader
+        self.model.eval()
+        predictions_list = []
+        labels_list = []
+        with torch.no_grad():
+            for inputs, labels in dataloader:
+                outputs = self.model(inputs)
+                predictions_list.append(outputs.numpy())
+                labels_list.append(labels.numpy())
+
+        return predictions_list, labels_list
