@@ -8,7 +8,7 @@ from torch import optim
 import matplotlib.pyplot as plt
 
 class ModelTrainer:
-    def __init__(self, train_loader, test_loader, model, lossf, learning_rate, num_epochs, print_interval):
+    def __init__(self, train_loader, test_loader, model, lossf, learning_rate, num_epochs, print_interval, filepath):
         self.train_loader = train_loader
         self.test_loader = test_loader
         self.model = model
@@ -16,6 +16,7 @@ class ModelTrainer:
         self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
         self.epochs = num_epochs
         self.print_int = print_interval
+        self.filepath = filepath
 
     def train(self):
         self.model.train()
@@ -70,3 +71,15 @@ class ModelTrainer:
                 labels_list.append(labels.numpy())
 
         return predictions_list, labels_list
+    
+    def save_model(self, filepath=None):
+        if filepath is None:
+            filepath = self.filepath
+        torch.save(self.model.state_dict(), filepath)
+        print("Model saved successfully at " + str(filepath))
+
+    def load_model(self, filepath=None):
+        if filepath is None:
+            filepath = self.filepath
+        self.model.load_state_dict(torch.load(filepath))
+        print("Model loaded successfully from " + str(filepath))
