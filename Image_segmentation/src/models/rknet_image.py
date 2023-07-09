@@ -42,7 +42,7 @@ class RungeKuttaIntegrator(nn.Module):
 class RKNet(nn.Module):
     def __init__(self, in_channels):
         super(RKNet, self).__init__()
-        w = 32
+        w = 128
         self.downsample = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=w, kernel_size=3, stride=1),
             nn.BatchNorm2d(w),
