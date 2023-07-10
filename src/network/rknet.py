@@ -51,12 +51,7 @@ class RKNet(nn.Module):
             nn.Conv2d(64, 64, 4, 2, 1)
         ])
 
-        self.rb1 = RungeKuttaIntegrator(ODEfunc(64), 0.001)
-        self.rb2 = RungeKuttaIntegrator(ODEfunc(64), 0.001)
-        self.rb3 = RungeKuttaIntegrator(ODEfunc(64), 0.001)
-        self.rb4 = RungeKuttaIntegrator(ODEfunc(64), 0.001)
-        self.rb5 = RungeKuttaIntegrator(ODEfunc(64), 0.001)
-        self.rb6 = RungeKuttaIntegrator(ODEfunc(64), 0.001)
+        self.rb = RungeKuttaIntegrator(ODEfunc(64), 0.001)
 
         self.flatten = nn.Flatten()
         self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))
@@ -69,12 +64,7 @@ class RKNet(nn.Module):
 
     def forward(self, x):
         out = self.downsampling_layer(x)
-        out = self.rb1(out)
-        out = self.rb2(out)
-        out = self.rb3(out)
-        out = self.rb4(out)
-        out = self.rb5(out)
-        out = self.rb6(out)
+        out = self.rb(out)
         out = self.norm(out)
         out = self.relu(out)
         out = self.adaptive_pool(out)
