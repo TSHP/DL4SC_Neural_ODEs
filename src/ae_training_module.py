@@ -48,6 +48,7 @@ class AETrainingModule:
         #total_steps = len(self.training_dataloader)
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
             running_loss = 0.0
+            running_loss_kl = 0.0
             #for _, (images, _) in (pbar := tqdm(enumerate(self.training_dataloader))):
             for _, (images, _) in enumerate(self.training_dataloader):
                 images = images.to(self.device)
@@ -55,6 +56,7 @@ class AETrainingModule:
                 kl_loss = self.model.kl_loss(mu, logvar)
                 loss = self.criterion(out, images) + self.kl_strength * kl_loss
                 running_loss += loss.item()
+                running_loss_kl += kl_loss.item()
 
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -63,7 +65,7 @@ class AETrainingModule:
 #                pbar.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Step[{i + 1}/{total_steps}], Loss: {loss.item():.4f}, KL-Loss: {kl_loss.item():.4f}')
 
             self.sample(num_samples=10, epoch=cur_epoch)
-            pbar_epoch.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Running Loss: {running_loss / len(self.training_dataloader):.4f}')      
+            pbar_epoch.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Running Loss: {running_loss / len(self.training_dataloader):.4f}, Running KL-Loss: {running_loss_kl / len(self.training_dataloader):.4f}')      
 
     def eval(self):
         running_loss = 0.0
