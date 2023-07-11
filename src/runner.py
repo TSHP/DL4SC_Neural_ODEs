@@ -18,5 +18,7 @@ def run(config):
         tm = TrainingModule(model, optimizer, config["training"])
 
     tm.fit(num_epochs=config["training"]["n_epochs"])
-
     tm.eval()
+
+    print(f"Saving model ...")
+    tm.save_model(config["model"]["network_name"])
