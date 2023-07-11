@@ -77,7 +77,7 @@ def visualize_results(predicts, masks):
 
     # Display the grid of images and masks
     plt.subplot(1, 2, 1)
-    plt.imshow(grid_images_np)
+    plt.imshow(grid_images_np[:, :, 0])
     plt.title("Predictions")
     plt.axis("off")
 
