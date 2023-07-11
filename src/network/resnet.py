@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from src.network.model_utils import norm, conv3x3
+from src.network.model_utils import norm
 
 
 class ResBlock(nn.Module):
@@ -11,9 +11,9 @@ class ResBlock(nn.Module):
         self.norm1 = norm(inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
-        self.conv1 = conv3x3(inplanes, planes, stride)
+        self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
         self.norm2 = norm(planes)
-        self.conv2 = conv3x3(planes, planes)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, padding=1, bias=False)
 
     def forward(self, x):
         shortcut = x
