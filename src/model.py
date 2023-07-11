@@ -25,8 +25,6 @@ def model_factory(params):
             out_dim=params["out_dim"]
         )
     elif params["network_name"] == "nae":
-        return NeuralAE(
-            out_dim=params["out_dim"]
-        )
+        return NeuralAE(params["latent_dim"])
     else:
         raise ValueError("Invalid network name")

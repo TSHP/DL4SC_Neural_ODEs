@@ -3,7 +3,7 @@ experiment:
   
   model:
     network_name: nae
-    out_dim: 10
+    latent_dim: 10
   
   training:
     n_epochs: 10

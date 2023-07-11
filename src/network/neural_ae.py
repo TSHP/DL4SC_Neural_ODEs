@@ -47,10 +47,11 @@ class ODEBlock(nn.Module):
 
 
 class NeuralAE(nn.Module):
-    def __init__(self):
+    def __init__(self, latent_dim):
         super(NeuralAE, self).__init__()
 
-        self.device = torch.device("cpu")
+        self.latent_dim = latent_dim
+
         self.device = torch.device("cpu")
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
@@ -77,9 +78,9 @@ class NeuralAE(nn.Module):
 
         self.enc = ODEBlock(ODEfunc(64)).to(self.device)
 
-        self.fc_mu = nn.Linear(64 * 36, 10).to(self.device)
-        self.fc_var = nn.Linear(64 * 36, 10).to(self.device)
-        self.decoder_input = nn.Linear(10, 64 * 36).to(self.device)
+        self.fc_mu = nn.Linear(64 * 36, self.latent_dim).to(self.device)
+        self.fc_var = nn.Linear(64 * 36, self.latent_dim).to(self.device)
+        self.decoder_input = nn.Linear(self.latent_dim, 64 * 36).to(self.device)
 
         self.dec = ODEBlock(ODEfunc(64, transpose=True)).to(self.device)
 
