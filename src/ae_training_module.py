@@ -84,7 +84,7 @@ class AETrainingModule:
 
     def sample(self, num_samples: int = 10, epoch: int = 0):
         with torch.no_grad():
-            samples = self.model.sample(num_samples, self.device)
+            samples = self.model.sample(num_samples)
             samples = samples.cpu()
             # Save as images
             torchvision.utils.save_image(samples, self.output_path / f"epoch_{epoch}_samples.png", nrow=10)
