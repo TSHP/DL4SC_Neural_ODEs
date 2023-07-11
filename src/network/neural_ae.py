@@ -89,7 +89,7 @@ class NeuralAE(nn.Module):
 
         out = self.decoder_input(z)
         out = out.view(-1, 64, 6, 6)
-        out = self.dec(out)
+        out = self.enc(out, torch.tensor([1, 0]).float().to(self.device))
 
         samples = self.upsampling_layer(out)
 
