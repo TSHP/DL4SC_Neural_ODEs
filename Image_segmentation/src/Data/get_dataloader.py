@@ -2,7 +2,7 @@ import os
 from torchvision import transforms
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
-
+import torchvision.transforms.InterpolationMode as IM
 class CustomVOCDataset(Dataset):
     def __init__(self, voc_dataset, transform_image=None, transform_mask=None):
         self.transform_image = transform_image
@@ -31,7 +31,7 @@ def get_dataloader(voc_dataset, out_size=32):
     ])
 
     transform_mask = transforms.Compose([
-        transforms.Resize((out_size, out_size)),
+        transforms.Resize((out_size, out_size), interpolation=IM.NEAREST),
         transforms.ToTensor(),
     ])
 
