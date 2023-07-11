@@ -8,6 +8,7 @@ experiment:
   training:
     n_epochs: 30
     batch_size: 128
+    output_path: ./output/slmlp
 
   optimizer:
     optimizer_name: adam

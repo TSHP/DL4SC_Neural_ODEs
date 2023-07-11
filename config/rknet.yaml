@@ -6,6 +6,7 @@ experiment:
   training:
     n_epochs: 10
     batch_size: 128
+    output_path: ./output/rknet
 
   optimizer:
     optimizer_name: adam

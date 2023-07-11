@@ -1,41 +1,19 @@
+import torch
 import torch.nn as nn
+from torchdiffeq import odeint
 
 from src.network.model_utils import norm
-
-class ODEfunc(nn.Module):
-    def __init__(self, dim):
-        super(ODEfunc, self).__init__()
-        self.norm1 = norm(dim)
-        self.relu = nn.ReLU(inplace=True)
-        self.conv1 = nn.Conv2d(dim, dim, 3, 1, 1)
-        self.norm2 = norm(dim)
-        self.conv2 = nn.Conv2d(dim, dim, 3, 1, 1)
-        self.norm3 = norm(dim)
-        self.nfe = 0
-
-    def forward(self, x):
-        self.nfe += 1
-        out = self.norm1(x)
-        out = self.relu(out)
-        out = self.conv1(out)
-        out = self.norm2(out)
-        out = self.relu(out)
-        out = self.conv2(out)
-        out = self.norm3(out)
-        return out
+from src.network.node_utils import ODEfunc
 
 class RungeKuttaIntegrator(nn.Module):
-    def __init__(self, f, dt):
+    def __init__(self, odefunc):
         super(RungeKuttaIntegrator, self).__init__()
-        self.f = f
-        self.dt = dt
+        self.odefunc = odefunc
+        self.integration_time = torch.tensor([0, 1]).float()
 
     def forward(self, x):
-        k1 = self.f(x)
-        k2 = self.f(x + self.dt * k1 / 2)
-        k3 = self.f(x + self.dt * k2 / 2)
-        k4 = self.f(x + self.dt * k3)
-        return x + self.dt * (k1 + 2 * k2 + 2 * k3 + k4) / 6
+        out = odeint(self.odefunc, x, self.integration_time, rtol=1e-3, atol=1e-3, method='rk4')
+        return out[1]
     
 
 class RKNet(nn.Module):
@@ -51,7 +29,7 @@ class RKNet(nn.Module):
             nn.Conv2d(64, 64, 4, 2, 1)
         ])
 
-        self.rb = RungeKuttaIntegrator(ODEfunc(64), 0.001)
+        self.rb = RungeKuttaIntegrator(ODEfunc(64))
 
         self.flatten = nn.Flatten()
         self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))

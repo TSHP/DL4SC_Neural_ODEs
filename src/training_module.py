@@ -5,13 +5,16 @@ import torch
 import torch.nn as nn
 import torchvision
 
-from src.constants import INPUT_DIR
+from src.constants import INPUT_DIR, MODEL_DIR
 
 
 class TrainingModule:
     def __init__(self, model, optimizer, params) -> None:
         self.model = model
         self.optimizer = optimizer
+
+        self.output_path = Path(params["output_path"])
+        self.output_path.mkdir(parents=True, exist_ok=True)
 
         self.batch_size = params["batch_size"]
 
@@ -35,10 +38,9 @@ class TrainingModule:
         print(f"Number of parameters: {self.model.get_num_params()}")
 
     def fit(self, num_epochs: int = 100):
-        total_steps = len(self.training_dataloader)
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
             running_loss = 0.0
-            for i, (images, labels) in (pbar := tqdm(enumerate(self.training_dataloader))):
+            for _, (images, labels) in tqdm(enumerate(self.training_dataloader)):
                 out = self.model(images)
                 loss = self.criterion(out, labels)
                 running_loss += loss.item()
@@ -47,7 +49,6 @@ class TrainingModule:
                 loss.backward()
                 self.optimizer.step()
 
-                pbar.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Step[{i + 1}/{total_steps}], Loss: {loss.item():.4f}') 
             pbar_epoch.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Running Loss: {running_loss / len(self.training_dataloader):.4f}')      
 
     def eval(self):
@@ -68,6 +69,10 @@ class TrainingModule:
         print(f'Error of the network on test MNIST: {100 * total_incorrect / total}%')
         print(f'Loss of the network on test MNIST: {running_loss / len(self.test_dataloader)}%')
         print(f"Number of parameters: {self.model.get_num_params()}")
+
+    def save_model(self, tag: str = ""):
+        MODEL_DIR.mkdir(parents=True, exist_ok=True)
+        torch.save(self.model.state_dict(), self.output_path / f"{tag}_model.pt")
 
 
 

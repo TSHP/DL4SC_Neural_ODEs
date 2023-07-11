@@ -1,50 +1,8 @@
 import torch
 import torch.nn as nn
-from torchdiffeq import odeint
 
-from src.network.model_utils import norm, ConcatConv2d
-
-class ODEfunc(nn.Module):
-    def __init__(self, dim, transpose=False):
-        super(ODEfunc, self).__init__()
-        self.norm1 = norm(dim)
-        self.relu = nn.ReLU(inplace=True)
-        self.conv1 = ConcatConv2d(dim, dim, 3, 1, 1, transpose=transpose)
-        self.norm2 = norm(dim)
-        self.conv2 = ConcatConv2d(dim, dim, 3, 1, 1, transpose=transpose)
-        self.norm3 = norm(dim)
-        self.nfe = 0
-
-    def forward(self, t, x):
-        self.nfe += 1
-        out = self.norm1(x)
-        out = self.relu(out)
-        out = self.conv1(t, out)
-        out = self.norm2(out)
-        out = self.relu(out)
-        out = self.conv2(t, out)
-        out = self.norm3(out)
-        return out
-
-class ODEBlock(nn.Module):
-    def __init__(self, odefunc):
-        super(ODEBlock, self).__init__()
-        self.odefunc = odefunc
-        self.integration_time = torch.tensor([0, 1]).float()
-
-    def forward(self, x):
-        self.integration_time = self.integration_time.type_as(x)
-        out = odeint(self.odefunc, x, self.integration_time, rtol=1e-3, atol=1e-3)
-        return out[1]
-
-    @property
-    def nfe(self):
-        return self.odefunc.nfe
-
-    @nfe.setter
-    def nfe(self, value):
-        self.odefunc.nfe = value
-
+from src.network.model_utils import norm
+from src.network.node_utils import ODEBlock, ODEfunc
 
 class NeuralAE(nn.Module):
     def __init__(self, latent_dim):
@@ -64,7 +22,7 @@ class NeuralAE(nn.Module):
             norm(64),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, 4, 2, 1)
-        ]).to(self.device)
+        ])
 
         self.upsampling_layer = nn.Sequential(*[
             nn.ConvTranspose2d(64, 64, 4, 2, 1, 0),
@@ -74,15 +32,15 @@ class NeuralAE(nn.Module):
             norm(64),
             nn.ReLU(inplace=True),
             nn.ConvTranspose2d(64, 1, 3, 1, 0, 0)
-        ]).to(self.device)
+        ])
 
-        self.enc = ODEBlock(ODEfunc(64)).to(self.device)
+        self.enc = ODEBlock(ODEfunc(64))
 
-        self.fc_mu = nn.Linear(64 * 36, self.latent_dim).to(self.device)
-        self.fc_var = nn.Linear(64 * 36, self.latent_dim).to(self.device)
-        self.decoder_input = nn.Linear(self.latent_dim, 64 * 36).to(self.device)
+        self.fc_mu = nn.Linear(64 * 36, self.latent_dim)
+        self.fc_var = nn.Linear(64 * 36, self.latent_dim)
+        self.decoder_input = nn.Linear(self.latent_dim, 64 * 36)
 
-        self.dec = ODEBlock(ODEfunc(64, transpose=True)).to(self.device)
+        self.dec = ODEBlock(ODEfunc(64, transpose=True))
 
     def get_num_params(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
