@@ -1,5 +1,5 @@
 from pathlib import Path
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 
 import torch
 import torch.nn as nn
@@ -45,10 +45,11 @@ class AETrainingModule:
         self.model.to(self.device)
 
     def fit(self, num_epochs: int = 100):
-        total_steps = len(self.training_dataloader)
+        #total_steps = len(self.training_dataloader)
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
             running_loss = 0.0
-            for i, (images, _) in (pbar := tqdm(enumerate(self.training_dataloader))):
+            #for _, (images, _) in (pbar := tqdm(enumerate(self.training_dataloader))):
+            for _, (images, _) in enumerate(self.training_dataloader):
                 images = images.to(self.device)
                 out, mu, logvar = self.model(images)
                 kl_loss = self.model.kl_loss(mu, logvar)
@@ -59,7 +60,7 @@ class AETrainingModule:
                 loss.backward()
                 self.optimizer.step()
 
-                pbar.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Step[{i + 1}/{total_steps}], Loss: {loss.item():.4f}, KL-Loss: {kl_loss.item():.4f}')
+#                pbar.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Step[{i + 1}/{total_steps}], Loss: {loss.item():.4f}, KL-Loss: {kl_loss.item():.4f}')
 
             self.sample(num_samples=10, epoch=cur_epoch)
             pbar_epoch.set_description(f'Epoch[{cur_epoch + 1}/{num_epochs}], Running Loss: {running_loss / len(self.training_dataloader):.4f}')      
@@ -83,7 +84,7 @@ class AETrainingModule:
 
     def sample(self, num_samples: int = 10, epoch: int = 0):
         with torch.no_grad():
-            samples = self.model.sample(num_samples)
+            samples = self.model.sample(num_samples, self.device)
             samples = samples.cpu()
             # Save as images
             torchvision.utils.save_image(samples, self.output_path / f"epoch_{epoch}_samples.png", nrow=10)

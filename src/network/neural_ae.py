@@ -154,14 +154,14 @@ class NeuralAE(nn.Module):
     def kl_loss(self, mu, log_var):
         return torch.mean(-0.5 * torch.sum(1 + log_var - mu ** 2 - log_var.exp(), dim = 1), dim = 0)
     
-    def sample(self, num_samples):
+    def sample(self, num_samples, device = torch.device('cpu')):
         """
         Samples from the latent space and return the corresponding
         image space map.
         :param num_samples: (Int) Number of samples
         :return: (Tensor)
         """
-        z = torch.randn(num_samples, 10)
+        z = torch.randn(num_samples, 10).to(device)
 
         out = self.decoder_input(z)
         out = out.view(-1, 64, 6, 6)
