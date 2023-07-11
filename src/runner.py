@@ -21,4 +21,4 @@ def run(config):
     tm.eval()
 
     print(f"Saving model ...")
-    tm.save_model(config["model"]["network_name"])
+    tm.save_model()

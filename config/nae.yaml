@@ -8,6 +8,8 @@ experiment:
   training:
     n_epochs: 10
     batch_size: 128
+    kl_strength: 1.e-3
+    output_path: ./output/nae
 
   optimizer:
     optimizer_name: adam
