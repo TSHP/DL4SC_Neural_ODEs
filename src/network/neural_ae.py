@@ -4,43 +4,6 @@ from torchdiffeq import odeint
 
 from src.network.model_utils import norm, ConcatConv2d
 
-def convert_conv_to_transpose_conv(conv_module, desired_output_size = None):
-    # Extract convolution parameters
-    in_channels = conv_module.in_channels
-    out_channels = conv_module.out_channels
-    kernel_size = conv_module.kernel_size
-    stride = conv_module.stride
-    padding = conv_module.padding
-
-    # Calculate transpose convolution parameters
-    transpose_kernel_size = kernel_size
-    transpose_stride = stride
-    transpose_padding = padding
-
-    # Calculate output padding based on desired output size
-    transpose_output_padding = None
-    if desired_output_size is not None:
-        input_size = (desired_output_size[0] + 2 * padding[0] - kernel_size[0]) // stride[0] + 1
-        transpose_output_padding = desired_output_size[0] - (input_size - 1) * stride[0] + kernel_size[0] - desired_output_size[0]
-
-    transpose_conv_module = None
-    if desired_output_size is not None:
-        # Create transpose convolution module
-        transpose_conv_module = nn.ConvTranspose2d(
-            in_channels, out_channels,
-            transpose_kernel_size, transpose_stride,
-            transpose_padding, output_padding=transpose_output_padding
-        )
-    else:
-        # Create transpose convolution module
-        transpose_conv_module = nn.ConvTranspose2d(
-            in_channels, out_channels,
-            transpose_kernel_size, transpose_stride,
-            transpose_padding
-        )
-
-    return transpose_conv_module
-
 class ODEfunc(nn.Module):
     def __init__(self, dim, transpose=False):
         super(ODEfunc, self).__init__()
@@ -84,8 +47,13 @@ class ODEBlock(nn.Module):
 
 
 class NeuralAE(nn.Module):
-    def __init__(self, out_dim):
+    def __init__(self):
         super(NeuralAE, self).__init__()
+
+        self.device = torch.device("cpu")
+        self.device = torch.device("cpu")
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
 
         self.downsampling_layer = nn.Sequential(*[
             nn.Conv2d(1, 64, 3, 1),
@@ -95,28 +63,25 @@ class NeuralAE(nn.Module):
             norm(64),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, 4, 2, 1)
-        ])
+        ]).to(self.device)
 
         self.upsampling_layer = nn.Sequential(*[
-            #convert_conv_to_transpose_conv(nn.Conv2d(64, 64, 4, 2, 1)),
             nn.ConvTranspose2d(64, 64, 4, 2, 1, 0),
             norm(64),
             nn.ReLU(inplace=True),
             nn.ConvTranspose2d(64, 64, 4, 2, 0, 0),
-            #convert_conv_to_transpose_conv(nn.Conv2d(64, 64, 4, 2, 1)),
             norm(64),
             nn.ReLU(inplace=True),
             nn.ConvTranspose2d(64, 1, 3, 1, 0, 0)
-            #convert_conv_to_transpose_conv(nn.Conv2d(1, 64, 3, 1)),
-        ])
+        ]).to(self.device)
 
-        self.enc = ODEBlock(ODEfunc(64))
+        self.enc = ODEBlock(ODEfunc(64)).to(self.device)
 
-        self.fc_mu = nn.Linear(64 * 36, 10)
-        self.fc_var = nn.Linear(64 * 36, 10)
-        self.decoder_input = nn.Linear(10, 64 * 36)
+        self.fc_mu = nn.Linear(64 * 36, 10).to(self.device)
+        self.fc_var = nn.Linear(64 * 36, 10).to(self.device)
+        self.decoder_input = nn.Linear(10, 64 * 36).to(self.device)
 
-        self.dec = ODEBlock(ODEfunc(64, transpose=True))
+        self.dec = ODEBlock(ODEfunc(64, transpose=True)).to(self.device)
 
     def get_num_params(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
@@ -154,14 +119,14 @@ class NeuralAE(nn.Module):
     def kl_loss(self, mu, log_var):
         return torch.mean(-0.5 * torch.sum(1 + log_var - mu ** 2 - log_var.exp(), dim = 1), dim = 0)
     
-    def sample(self, num_samples, device = torch.device('cpu')):
+    def sample(self, num_samples):
         """
         Samples from the latent space and return the corresponding
         image space map.
         :param num_samples: (Int) Number of samples
         :return: (Tensor)
         """
-        z = torch.randn(num_samples, 10).to(device)
+        z = torch.randn(num_samples, 10).to(self.device)
 
         out = self.decoder_input(z)
         out = out.view(-1, 64, 6, 6)
