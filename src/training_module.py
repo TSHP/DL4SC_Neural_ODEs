@@ -70,7 +70,7 @@ class TrainingModule:
         print(f'Loss of the network on test MNIST: {running_loss / len(self.test_dataloader)}%')
         print(f"Number of parameters: {self.model.get_num_params()}")
 
-    def save_model(self, tag: str = ""):
+    def save_model(self, tag: str = "last"):
         MODEL_DIR.mkdir(parents=True, exist_ok=True)
         torch.save(self.model.state_dict(), self.output_path / f"{tag}_model.pt")
 

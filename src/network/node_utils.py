@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-from torchdiffeq import odeint_adjoint as odeint
+#from torchdiffeq import odeint_adjoint as odeint
+from torchdiffeq import odeint
 
 from src.network.model_utils import norm, ConcatConv2d
 
@@ -30,11 +31,10 @@ class ODEBlock(nn.Module):
     def __init__(self, odefunc):
         super(ODEBlock, self).__init__()
         self.odefunc = odefunc
-        self.integration_time = torch.tensor([0, 1]).float()
 
-    def forward(self, x):
-        self.integration_time = self.integration_time.type_as(x)
-        out = odeint(self.odefunc, x, self.integration_time, rtol=1e-3, atol=1e-3)
+    def forward(self, x, t):
+        t = t.type_as(x)
+        out = odeint(self.odefunc, x, t, rtol=1e-3, atol=1e-3)
         return out[1]
 
     @property

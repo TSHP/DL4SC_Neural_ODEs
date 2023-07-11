@@ -40,7 +40,7 @@ class NeuralAE(nn.Module):
         self.fc_var = nn.Linear(64 * 36, self.latent_dim)
         self.decoder_input = nn.Linear(self.latent_dim, 64 * 36)
 
-        #self.dec = ODEBlock(ODEfunc(64, transpose=True))
+        self.dec = ODEBlock(ODEfunc(64, transpose=True))
 
     def get_num_params(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
@@ -60,7 +60,7 @@ class NeuralAE(nn.Module):
     def forward(self, x):
         out = self.downsampling_layer(x)
 
-        out = self.enc(out, torch.tensor([0, 1]).float().to(self.device))
+        out = self.enc(out)
         out = torch.flatten(out, start_dim=1)
 
         mu = self.fc_mu(out)
@@ -69,7 +69,7 @@ class NeuralAE(nn.Module):
 
         out = self.decoder_input(z)
         out = out.view(-1, 64, 6, 6)
-        out = self.enc(out, torch.tensor([1, 0]).float().to(self.device))
+        out = self.dec(out)
 
         out = self.upsampling_layer(out)
         
