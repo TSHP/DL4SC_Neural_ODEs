@@ -13,7 +13,7 @@ class AETrainingModule:
         self.model = model
         self.optimizer = optimizer
 
-        self.output_path = Path(params["output_dir"])
+        self.output_path = Path(params["output_path"])
         self.output_path.mkdir(parents=True, exist_ok=True)
 
         self.batch_size = params["batch_size"]
