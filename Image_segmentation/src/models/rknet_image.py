@@ -40,7 +40,7 @@ class RungeKuttaIntegrator(nn.Module):
     
 
 class RKNet(nn.Module):
-    def __init__(self, in_channels, out_channels=20):
+    def __init__(self, in_channels, out_channels):
         super(RKNet, self).__init__()
         w = 128
         self.downsample = nn.Sequential(
@@ -60,7 +60,7 @@ class RKNet(nn.Module):
 
         self.final = nn.Sequential(nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=1, stride=1),
                       nn.BatchNorm2d(out_channels),
-                      nn.Sigmoid(inplace=True))
+                      nn.Sigmoid())
 
     def get_num_params(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)

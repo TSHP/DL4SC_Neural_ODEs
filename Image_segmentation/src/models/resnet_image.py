@@ -21,7 +21,7 @@ class ResidualBlock(nn.Module):
 
 # Define the ResNet model
 class ResNet6_images(nn.Module):
-    def __init__(self, in_channels, out_channels=20):
+    def __init__(self, in_channels, out_channels):
         super(ResNet6_images, self).__init__()
         w = 128
         self.downsample = nn.Sequential(
@@ -46,7 +46,7 @@ class ResNet6_images(nn.Module):
         )
         self.final = nn.Sequential(nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=1, stride=1),
                       nn.BatchNorm2d(out_channels),
-                      nn.Sigmoid(inplace=True))
+                      nn.Sigmoid())
 
     def forward(self, x):
         out = self.downsample(x)

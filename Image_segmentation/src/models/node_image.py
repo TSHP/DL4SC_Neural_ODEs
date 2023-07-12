@@ -65,7 +65,7 @@ class ODEBlock(nn.Module):
         self.odefunc.nfe = value
 
 class ODENet(nn.Module):
-    def __init__(self, in_dim, out_channels=20):
+    def __init__(self, in_dim, out_channels):
         super(ODENet, self).__init__()
 
         w = 128
@@ -86,7 +86,7 @@ class ODENet(nn.Module):
 
         self.final = nn.Sequential(nn.Conv2d(in_channels=w, out_channels=20, kernel_size=1, stride=1),
                       nn.BatchNorm2d(1),
-                      nn.Sigmoid(inplace=True))
+                      nn.Sigmoid())
 
     def get_num_params(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)

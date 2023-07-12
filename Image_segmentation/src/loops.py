@@ -8,7 +8,7 @@ from torch import optim
 import matplotlib.pyplot as plt
 
 class ModelTrainer:
-    def __init__(self, train_loader, test_loader, model, lossf, learning_rate, num_epochs, print_interval, filepath):
+    def __init__(self, train_loader, test_loader, model, lossf, learning_rate, num_epochs, print_interval, filepath, device):
         self.train_loader = train_loader
         self.test_loader = test_loader
         self.model = model
@@ -17,6 +17,7 @@ class ModelTrainer:
         self.epochs = num_epochs
         self.print_int = print_interval
         self.filepath = filepath
+        self.device = device
 
     def train(self):
         self.model.train()
@@ -24,6 +25,7 @@ class ModelTrainer:
             running_loss = 0.0
             eval_counter = 0
             for i, (inputs, labels) in enumerate(self.train_loader, 1):
+                inputs, labels = inputs.to(self.device), labels.to(self.device)
                 self.optimizer.zero_grad()
 
                 outputs = self.model(inputs)
@@ -51,6 +53,7 @@ class ModelTrainer:
         running_loss = 0.
         with torch.no_grad():
             for inputs, labels in self.test_loader:
+                inputs, labels = inputs.to(self.device), labels.to(self.device)
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, labels)
                 running_loss += loss.item()
