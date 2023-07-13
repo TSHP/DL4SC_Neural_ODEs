@@ -9,7 +9,7 @@ class ClassificationTrainingModule(ABCTrainingModule):
         super().__init__(model, optimizer, params)
         self.num_classes = num_classes
         self.loss = torch.nn.CrossEntropyLoss()
-        self.accuracy = Accuracy(task="multiclass", num_classes=self.num_classes)
+        self.accuracy = Accuracy(task="multiclass", num_classes=self.num_classes).to(self.device)
 
     def compute_loss(self, inputs, labels):
         out = self.model(inputs)
