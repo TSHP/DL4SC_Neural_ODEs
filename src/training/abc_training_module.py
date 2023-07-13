@@ -53,6 +53,7 @@ class ABCTrainingModule(ABC):
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
             running_loss = 0.0
             for _, (images, labels) in tqdm(enumerate(self.train_dataloader)):
+                images = images.to(self.device)
                 _, loss = self.step(images, labels)
                 running_loss += loss
                 train_loss_history.append(loss)
@@ -62,6 +63,7 @@ class ABCTrainingModule(ABC):
             val_labels = []
             with torch.no_grad():
                 for _, (images, labels) in enumerate(self.val_dataloader):
+                    images = images.to(self.device)
                     out, loss = self.step(images, labels, eval=True)
                     running_val_loss += loss
                     val_predictions.append(out)
@@ -105,6 +107,7 @@ class ABCTrainingModule(ABC):
 
         with torch.no_grad():
             for _, (images, labels) in enumerate(self.test_dataloader):
+                images = images.to(self.device)
                 out, loss = self.step(images, labels, eval=True)
                 running_test_loss += loss
                 test_predictions.append(out)
