@@ -1,0 +1,27 @@
+experiment:
+  title: ODENet with adjoint method for MNIST classification
+  mode: classification
+
+  model:
+    network_name: odenet
+    out_dim: 10
+    adjoint: True
+    rtol: 1.e-7
+    atol: 1.e-9 
+    method: dopri5
+  
+  training:
+    dataset_name: mnist
+    n_epochs: 10
+    batch_size: 128
+    output_path: ./io/output/odenet
+
+  optimizer:
+    optimizer_name: adam
+    lr: 0.0001
+    betas: [0.9, 0.999]
+    eps: 1.e-7
+    weight_decay: 1.e-4
+    amsgrad: false
+
+  seed: 42
