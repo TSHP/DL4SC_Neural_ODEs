@@ -26,7 +26,7 @@ class CustomVOCDataset(Dataset):
         
 def encode(x):
     x[x==255] = 0
-    x = F.one_hot(x.to(torch.int64), 21).permute(0,3,2,1).to(torch.float)
+    x = F.one_hot(x.to(torch.int64), 21).permute(0,3,1,2).to(torch.float)
     x = torch.squeeze(x)
     return x
 
@@ -47,6 +47,6 @@ def get_dataloader(voc_dataset, out_size=32, batch_size=32):
     dataset = CustomVOCDataset(voc_dataset, transform_image=transform_image,
                             transform_mask=transform_mask)
 
-    VOC_data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=0)
+    VOC_data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
     return VOC_data_loader

@@ -48,12 +48,12 @@ def visualize_dataloader(VOC_data_loader):
 
     # Display the grid of images and masks
     plt.subplot(1, 2, 1)
-    plt.imshow(grid_images_np)
+    plt.imshow(grid_images_np[:, :, 0])
     plt.title("Images")
     plt.axis("off")
 
     plt.subplot(1, 2, 2)
-    plt.imshow(grid_masks_np)
+    plt.imshow(grid_masks_np[:, :, 0])
     plt.title("Masks")
     plt.axis("off")
 

@@ -65,15 +65,12 @@ class ODEBlock(nn.Module):
         self.odefunc.nfe = value
 
 class ODENet(nn.Module):
-    def __init__(self, in_dim, out_channels):
+    def __init__(self, in_channels, out_channels):
         super(ODENet, self).__init__()
 
-        w = 128
+        w = 32
         self.downsample = nn.Sequential(
-            nn.Conv2d(in_channels=in_dim, out_channels=w, kernel_size=3, stride=1),
-            nn.BatchNorm2d(w),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=w, out_channels=w, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(in_channels=in_channels, out_channels=w, kernel_size=3, stride=1),
             nn.BatchNorm2d(w),
             nn.ReLU(inplace=True),
             nn.Conv2d(in_channels=w, out_channels=w, kernel_size=3, stride=2, padding=1),
@@ -84,16 +81,21 @@ class ODENet(nn.Module):
 
         self.rb = ODEBlock(ODEfunc(w))
 
-        self.final = nn.Sequential(nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=1, stride=1),
-                      nn.BatchNorm2d(out_channels),
-                      nn.Sigmoid())
+        self.upsample = nn.Sequential(nn.ConvTranspose2d(w, w, kernel_size=2, stride=2, padding=0),
+                                   nn.BatchNorm2d(w),
+                                   nn.ReLU(inplace=True),
+                                   nn.ConvTranspose2d(w, w, kernel_size=2, stride=2, padding=0),
+                                   nn.BatchNorm2d(w),
+                                   nn.ReLU(inplace=True),
+                                   nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=3, padding=1),
+                                   nn.BatchNorm2d(out_channels),
+                                   nn.Sigmoid())
 
     def get_num_params(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def forward(self, x):
-
         out = self.downsample(x)
         out = self.rb(out)
-        out = self.final(out)
+        out = self.upsample(out)
         return out
