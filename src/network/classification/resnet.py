@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 from src.network.utils.model import ResBlock, norm
@@ -7,14 +6,18 @@ class ResNet(nn.Module):
     def __init__(self, out_dim, num_res_blocks=6):
         super(ResNet, self).__init__()
 
+        self.relu = nn.ReLU()
+        self.flatten = nn.Flatten()
+        self.norm = norm(64)
+
         self.downsampling_layer = nn.Sequential(
             *[
                 nn.Conv2d(1, 64, 3, 1),
-                norm(64),
-                nn.ReLU(inplace=True),
+                self.norm,
+                self.relu,
                 nn.Conv2d(64, 64, 4, 2, 1),
-                norm(64),
-                nn.ReLU(inplace=True),
+                self.norm,
+                self.relu,
                 nn.Conv2d(64, 64, 4, 2, 1),
             ]
         )
@@ -29,7 +32,7 @@ class ResNet(nn.Module):
         out = self.norm(out)
         out = self.relu(out)
         out = self.adaptive_pool(out)
-        out = torch.flatten(out)
+        out = self.flatten(out)
         out = self.fc(out)
         return out
     

@@ -14,6 +14,7 @@ def model_factory(params):
     elif params["network_name"] == "resnet":
         return ResNet(
             out_dim=params["out_dim"],
+            num_res_blocks=params["num_res_blocks"],
         )
     elif params["network_name"] == "odenet":
         return ODENet(out_dim=params["out_dim"])
