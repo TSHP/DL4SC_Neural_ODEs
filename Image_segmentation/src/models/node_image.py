@@ -84,8 +84,8 @@ class ODENet(nn.Module):
 
         self.rb = ODEBlock(ODEfunc(w))
 
-        self.final = nn.Sequential(nn.Conv2d(in_channels=w, out_channels=20, kernel_size=1, stride=1),
-                      nn.BatchNorm2d(1),
+        self.final = nn.Sequential(nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=1, stride=1),
+                      nn.BatchNorm2d(out_channels),
                       nn.Sigmoid())
 
     def get_num_params(self):

@@ -53,7 +53,7 @@ def visualize_dataloader(VOC_data_loader):
     plt.axis("off")
 
     plt.subplot(1, 2, 2)
-    plt.imshow(grid_masks_np[:, :, 0])
+    plt.imshow(grid_masks_np)
     plt.title("Masks")
     plt.axis("off")
 
@@ -67,7 +67,8 @@ def visualize_results(predicts, masks):
     predicts = torch.tensor(predicts[0])
     masks = torch.tensor(masks[0])
     
-    # Create a grid of images for visualization
+    predicts = torch.argmax(predicts, dim=1, keepdim=True)
+
     grid_images = make_grid(predicts)
     grid_masks = make_grid(masks)
 

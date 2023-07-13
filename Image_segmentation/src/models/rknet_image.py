@@ -67,6 +67,9 @@ class RKNet(nn.Module):
 
     def forward(self, x):
         out = self.downsample(x)
+        print(out.shape)
         out = self.rb(out)
+        print(out.shape)
         out = self.final(out)
+        print(out.shape)
         return out

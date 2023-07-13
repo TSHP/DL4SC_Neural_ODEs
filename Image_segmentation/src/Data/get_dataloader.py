@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import torch
 import torchvision.transforms as transforms
+
 class CustomVOCDataset(Dataset):
     def __init__(self, voc_dataset, transform_image=None, transform_mask=None):
         self.transform_image = transform_image
@@ -29,7 +30,7 @@ def encode(x):
     x = torch.squeeze(x)
     return x
 
-def get_dataloader(voc_dataset, out_size=32):
+def get_dataloader(voc_dataset, out_size=32, batch_size=32):
 
     transform_image = transforms.Compose([
         transforms.Resize((256, 256)),
@@ -41,13 +42,11 @@ def get_dataloader(voc_dataset, out_size=32):
         transforms.Resize((out_size, out_size), interpolation= transforms.InterpolationMode.NEAREST),
         transforms.ToTensor(),
         lambda x: encode(x) 
-        
     ])
 
-    # need this custom method that transform also get applied to masks
     dataset = CustomVOCDataset(voc_dataset, transform_image=transform_image,
                             transform_mask=transform_mask)
 
-    VOC_data_loader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=2)
+    VOC_data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=0)
 
     return VOC_data_loader

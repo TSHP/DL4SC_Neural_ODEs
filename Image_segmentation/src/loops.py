@@ -59,7 +59,7 @@ class ModelTrainer:
                 running_loss += loss.item()
 
         final_loss = running_loss / len(self.test_loader)
-        print(f"Test avg dice loss: {final_loss:.2f}%")
+        print(f"Test Loss: {final_loss:.2f}")
         
     def predict(self, dataloader=None):
         if dataloader is None:
@@ -69,9 +69,10 @@ class ModelTrainer:
         labels_list = []
         with torch.no_grad():
             for inputs, labels in dataloader:
+                inputs, labels = inputs.to(self.device), labels.to(self.device)
                 outputs = self.model(inputs)
-                predictions_list.append(outputs.numpy())
-                labels_list.append(labels.numpy())
+                predictions_list.append(outputs.cpu().numpy())
+                labels_list.append(labels.cpu().numpy())
 
         return predictions_list, labels_list
     

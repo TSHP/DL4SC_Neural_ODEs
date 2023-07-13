@@ -23,12 +23,9 @@ class ResidualBlock(nn.Module):
 class ResNet6_images(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(ResNet6_images, self).__init__()
-        w = 128
+        w = 32
         self.downsample = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=w, kernel_size=3, stride=1),
-            nn.BatchNorm2d(w),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=w, out_channels=w, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(w),
             nn.ReLU(inplace=True),
             nn.Conv2d(in_channels=w, out_channels=w, kernel_size=3, stride=2, padding=1),
@@ -44,12 +41,17 @@ class ResNet6_images(nn.Module):
             ResidualBlock(w, w),
             ResidualBlock(w, w)
         )
-        self.final = nn.Sequential(nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=1, stride=1),
-                      nn.BatchNorm2d(out_channels),
-                      nn.Sigmoid())
+        self.upsample = nn.Sequential(nn.ConvTranspose2d(w, w, 3, stride=2, padding=1),
+                                   nn.BatchNorm2d(w),
+                                   nn.ReLU(inplace=True),
+                                   nn.ConvTranspose2d(w, w, 3, stride=2, padding=1),
+                                   nn.BatchNorm2d(w),
+                                   nn.ReLU(inplace=True),
+                                   nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=3, padding=1),
+                                   nn.BatchNorm2d(out_channels))
 
     def forward(self, x):
         out = self.downsample(x)
         out = self.residual_blocks(out)
-        out = self.final(out)
+        out = self.upsample(out)
         return out
