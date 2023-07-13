@@ -1,10 +1,9 @@
-import torch.nn as nn
 import torchvision
 
 from src.constants import INPUT_DIR
 
 
-def loss_factory(params):
+def dataset_factory(params):
     if params["dataset_name"] == "mnist":
         return torchvision.datasets.MNIST(
             root=INPUT_DIR,

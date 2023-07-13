@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-from network.utils.model import norm
-from network.utils.node import ODEBlock, ODEfunc
+from src.network.utils.model import norm
+from src.network.utils.node import ODEBlock, ODEfunc
 
 
 class NeuralVAE(nn.Module):

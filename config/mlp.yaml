@@ -1,16 +1,18 @@
 experiment:
+  title: Single-Layer MLP for MNIST classification
   mode: classification
 
   model:
-    network_name: slmlp
+    network_name: mlp
     in_dim: 784
+    hidden_dims: [300]
     out_dim: 10
-    hidden_dim: 300
   
   training:
-    n_epochs: 30
+    dataset_name: mnist
+    n_epochs: 20
     batch_size: 128
-    output_path: ./io/output/slmlp
+    output_path: ./io/output/mlp
 
   optimizer:
     optimizer_name: adam

@@ -1,4 +1,5 @@
 experiment:
+  title: ResNet for MNIST classification
   mode: classification
 
   model:

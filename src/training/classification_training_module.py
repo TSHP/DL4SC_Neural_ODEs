@@ -1,47 +1,29 @@
 import torch
+from torchmetrics import Accuracy
 
-from training.abc_training_module import ABCTrainingModule
+from src.training.abc_training_module import ABCTrainingModule
 
 
 class ClassificationTrainingModule(ABCTrainingModule):
-    def __init__(self, model, optimizer, params) -> None:
-        self.super().__init__(model, optimizer, params)     
+    def __init__(self, model, optimizer, params, num_classes) -> None:
+        super().__init__(model, optimizer, params)
+        self.num_classes = num_classes
+        self.loss = torch.nn.CrossEntropyLoss()
+        self.accuracy = Accuracy(task="multiclass", num_classes=self.num_classes)
 
-    def train_step(self, images, labels):
-        out = self.model(images)
-        loss = self.criterion(out, labels)
-        step_loss = loss.item()
-
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
-
-        return step_loss
+    def compute_loss(self, inputs, labels):
+        out = self.model(inputs)
+        return out, self.loss(out, labels)
     
-    def eval_step(self, images, labels):
-        out = self.model(images)
-        step_loss = self.criterion(out, labels)
-        return step_loss
+    def compute_test_error(self, predictions, labels):
+        return (1 - self.accuracy(predictions, labels)).item()
     
-    def test(self):
-        total_incorrect = 0
-        total = 0
-        running_loss = 0.0
-        with torch.no_grad():
-            for _, (images, labels) in enumerate(self.test_dataloader):
-                out = self.model(images)
-                loss = self.criterion(out, labels)
-                running_loss += loss.item()
-
-                _, predicted = torch.max(out.data, 1)
-                total_incorrect += (predicted != labels).sum().item()
-                total += labels.size(0)
-
-        print(f"Error of the network on test: {100 * total_incorrect / total}%")
-        print(
-            f"Loss of the network on test: {running_loss / len(self.test_dataloader)}%"
-        )
-        print(f"Number of parameters: {self.model.get_num_params()}")
+    def compute_metrics(self, predictions, labels):
+        return {
+            "Test Error": self.compute_test_error(predictions, labels)
+        }
+    
+    
 
 
 

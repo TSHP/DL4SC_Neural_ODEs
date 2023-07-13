@@ -3,7 +3,7 @@ from functools import partial
 import torch.nn as nn
 from torchdiffeq import odeint_adjoint, odeint
 
-from network.utils.model import norm, ConcatConv2d
+from src.network.utils.model import norm, ConcatConv2d
 
 class ODEfunc(nn.Module):
     def __init__(self, dim, transpose=False):

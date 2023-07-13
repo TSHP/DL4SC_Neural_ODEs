@@ -1,9 +1,9 @@
 pathlib
+tqdm
 pyyaml
 numpy
 matplotlib
 torch
 torchvision
 torchdiffeq
-black
-tqdm
+torchmetrics

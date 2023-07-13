@@ -1,15 +1,15 @@
-from src.network.slmlp import SLMLP
-from src.network.resnet import ResNet
-from src.network.odenet import ODENet
-from network.generative.neural_vae import NeuralVAE
+from src.network.classification.mlp import MLP
+from src.network.classification.resnet import ResNet
+from src.network.classification.odenet import ODENet
+from src.network.generative.neural_vae import NeuralVAE
 
 
 def model_factory(params):
-    if params["network_name"] == "slmlp":
-        return SLMLP(
+    if params["network_name"] == "mlp":
+        return MLP(
             in_dim=params["in_dim"],
             out_dim=params["out_dim"],
-            hidden_dim=params["hidden_dim"],
+            hidden_dims=params["hidden_dims"],
         )
     elif params["network_name"] == "resnet":
         return ResNet(

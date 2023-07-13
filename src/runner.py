@@ -1,7 +1,8 @@
-from model import model_factory
-from optimizer import optimizer_factory
-from training.classification_training_module import ClassificationTrainingModule
-from training.vae_training_module import VAETrainingModule
+from src.model import model_factory
+from src.optimizer import optimizer_factory
+from src.training.classification_training_module import ClassificationTrainingModule
+from src.training.segmentation_training_module import SegmentationTrainingModule
+from src.training.vae_training_module import VAETrainingModule
 
 
 def run(config):
@@ -13,14 +14,13 @@ def run(config):
     if config.get("mode") == "vae":
         tm = VAETrainingModule(model, optimizer, config["training"])
     elif config.get("mode") == "classification":
-        tm = ClassificationTrainingModule(model, optimizer, config["training"])
+        tm = ClassificationTrainingModule(model, optimizer, config["training"], config["model"]["out_dim"])
     elif config.get("mode") == "segmentation":
-        tm = ClassificationTrainingModule(model, optimizer, config["training"])
+        tm = SegmentationTrainingModule(model, optimizer, config["training"])
     else:
         raise ValueError("Invalid mode")
 
-    tm.fit(num_epochs=config["training"]["n_epochs"])
-    tm.eval()
+    model_tags = tm.fit(num_epochs=config["training"]["n_epochs"])
 
-    print(f"Saving model ...")
-    tm.save_model()
+    for tag in model_tags:
+        tm.test(tag)

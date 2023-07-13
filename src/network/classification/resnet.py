@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from network.utils.model import ResBlock, norm
+from src.network.utils.model import ResBlock, norm
 
 class ResNet(nn.Module):
     def __init__(self, out_dim, num_res_blocks=6):
