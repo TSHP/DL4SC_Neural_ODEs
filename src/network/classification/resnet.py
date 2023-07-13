@@ -4,8 +4,19 @@ from src.network.utils.model import ResBlock, norm
 
 
 class ResNet(nn.Module):
-    def __init__(self, out_dim, num_res_blocks=6):
+    def __init__(
+        self,
+        num_res_blocks=6,
+        num_filters=64,
+        kernel_size=3,
+        num_channels=1,
+        out_dim=10,
+    ):
         super(ResNet, self).__init__()
+
+        self.kernel_size = kernel_size
+        self.num_filters = num_filters
+        self.num_channels = num_channels
 
         self.relu = nn.ReLU()
         self.flatten = nn.Flatten()
@@ -24,7 +35,10 @@ class ResNet(nn.Module):
         )
 
         self.res_blocks = nn.Sequential(
-            *[ResBlock(64, 64) for _ in range(num_res_blocks)]
+            *[
+                ResBlock(self.num_filters, self.kernel_size, strides=[1, 1])
+                for _ in range(num_res_blocks)
+            ]
         )
         self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(64, out_dim)

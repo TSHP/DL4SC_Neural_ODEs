@@ -15,6 +15,7 @@ class ABCTrainingModule(ABC):
         self.model = model
         self.optimizer = optimizer
         self.batch_size = params.get("batch_size", 32)
+        self.epoch = 0
 
         # Load dataset
         self.dataset, self.test_dataset = dataset_factory(params)
@@ -51,6 +52,7 @@ class ABCTrainingModule(ABC):
         val_loss_history = []
         val_metrics_history = []
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
+            self.epoch = cur_epoch
             running_loss = 0.0
             for _, (images, labels) in enumerate(self.train_dataloader):
                 images = images.to(self.device)
@@ -62,6 +64,7 @@ class ABCTrainingModule(ABC):
             running_val_loss = 0.0
             val_predictions = []
             val_labels = []
+            val_images = []
             with torch.no_grad():
                 for _, (images, labels) in enumerate(self.val_dataloader):
                     images = images.to(self.device)
@@ -70,13 +73,14 @@ class ABCTrainingModule(ABC):
                     running_val_loss += loss
                     val_predictions.append(out)
                     val_labels.append(labels)
+                    val_images.append(images)
 
                 val_loss_history.append(running_val_loss)
 
             # Show metrics in pbar
             pbar_description = f"Epoch[{cur_epoch + 1}/{num_epochs}], Loss: {running_loss / len(self.train_dataloader):.4f}, Val Loss: {running_val_loss / len(self.val_dataloader):.4f}"
             val_metrics = self.compute_metrics(
-                torch.cat(val_predictions, 0), torch.cat(val_labels, 0)
+                torch.cat(val_predictions, 0), torch.cat(val_labels, 0), torch.cat(val_images, 0)
             )
             val_metrics_history.append(val_metrics)
             for k, v in val_metrics.items():
@@ -114,6 +118,7 @@ class ABCTrainingModule(ABC):
         running_test_loss = 0.0
         test_predictions = []
         test_lables = []
+        test_images = []
 
         with torch.no_grad():
             for _, (images, labels) in enumerate(self.test_dataloader):
@@ -123,14 +128,18 @@ class ABCTrainingModule(ABC):
                 running_test_loss += loss
                 test_predictions.append(out)
                 test_lables.append(labels)
+                test_images.append(images)
 
         test_metrics = self.compute_metrics(
-            torch.cat(test_predictions, 0), torch.cat(test_lables, 0)
+            torch.cat(test_predictions, 0), torch.cat(test_lables, 0), torch.cat(test_images, 0)
         )
 
         # Save metrics
         with open(self.output_path / f"{model_tag}_test_metrics.json", "w+") as file:
             json.dump(test_metrics, file)
+
+        print(f"Model {model_tag}")
+        print(test_metrics)
 
     def step(self, images, labels, eval=False):
         """Returns loss"""

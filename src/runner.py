@@ -30,3 +30,5 @@ def run(config):
 
     for tag in model_tags:
         tm.test(tag)
+
+    print(f"Number of parameters: {tm.model.num_params}")

@@ -13,12 +13,12 @@ class SegmentationTrainingModule(ABCTrainingModule):
             self.device
         )
 
-    def compute_loss(self, inputs, labels):
+    def compute_loss(self, inputs, masks):
         out = self.model(inputs)
-        return out, self.loss(out, labels)
+        return out, self.loss(out, masks)
 
-    def compute_mIoU(self, predictions, masks):
+    def compute_mIoU(self, predictions, masks, gt_images):
         return self.jaccard(predictions, masks)
 
-    def compute_metrics(self, inputs, labels):
-        return {"mIoU": self.compute_mIoU(inputs, labels)}
+    def compute_metrics(self, predictions, masks):
+        return {"mIoU": self.compute_mIoU(predictions, masks)}

@@ -3,8 +3,9 @@ experiment:
   mode: segmentation
 
   model:
-    network_name: resnet
-    num_res_blocks: 6
+    network_name: resnet_segmentation
+    kernel_size: 5
+    num_filters: [3, 32, 64, 128, 256]
     out_dim: 21
   
   training:

@@ -3,7 +3,7 @@ experiment:
   mode: segmentation
 
   model:
-    network_name: odenet
+    network_name: odenet_segmentation
     out_dim: 21
     adjoint: True
     rtol: 1.e-7
