@@ -15,14 +15,18 @@ class NeuralVAE(nn.Module):
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
 
+        self.relu = nn.ReLU(inplace=True)
+        self.norm = norm(64)
+        self.flatten = nn.Flatten()
+
         self.downsampling_layer = nn.Sequential(
             *[
                 nn.Conv2d(1, 64, 3, 1),
-                norm(64),
-                nn.ReLU(inplace=True),
+                self.norm,
+                self.relu,
                 nn.Conv2d(64, 64, 4, 2, 1),
-                norm(64),
-                nn.ReLU(inplace=True),
+                self.norm,
+                self.relu,
                 nn.Conv2d(64, 64, 4, 2, 1),
             ]
         )
@@ -30,11 +34,11 @@ class NeuralVAE(nn.Module):
         self.upsampling_layer = nn.Sequential(
             *[
                 nn.ConvTranspose2d(64, 64, 4, 2, 1, 0),
-                norm(64),
-                nn.ReLU(inplace=True),
+                self.norm,
+                self.relu,
                 nn.ConvTranspose2d(64, 64, 4, 2, 0, 0),
-                norm(64),
-                nn.ReLU(inplace=True),
+                self.norm,
+                self.relu,
                 nn.ConvTranspose2d(64, 1, 3, 1, 0, 0),
             ]
         )
@@ -57,7 +61,7 @@ class NeuralVAE(nn.Module):
 
         # Solve the ODE forward
         out = self.node(out, torch.tensor([0, 1]).float().to(self.device))
-        out = torch.flatten(out, start_dim=1)
+        out = self.flatten(out)
 
         mu = self.fc_mu(out)
         log_var = self.fc_var(out)

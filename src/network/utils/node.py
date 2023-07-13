@@ -38,7 +38,7 @@ class ODEBlock(nn.Module):
 
     def forward(self, x, t):
         t = t.type_as(x)
-        out = odeint(self.odefunc, x, t, rtol=1e-3, atol=1e-3)
+        out = self.solver(self.odefunc, x, t)
         return out[1]
     
     def set_solver(self, adjoint=False, rtol=1e-7, atol=1e-9, method="dopri5"):

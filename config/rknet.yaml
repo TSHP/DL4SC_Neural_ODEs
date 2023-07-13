@@ -11,6 +11,7 @@ experiment:
     method: rk4
   
   training:
+    dataset_name: mnist
     n_epochs: 10
     batch_size: 128
     output_path: ./io/output/rknet
