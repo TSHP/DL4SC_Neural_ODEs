@@ -1,6 +1,17 @@
+import torch
+import torch.nn.functional as F
+
 import torchvision
+import torchvision.transforms as transforms
 
 from src.constants import INPUT_DIR
+
+
+def one_hot(x):
+    x[x == 255] = 0
+    x = F.one_hot(x.to(torch.int64), 21).permute(0, 3, 2, 1).to(torch.float)
+    x = torch.squeeze(x)
+    return x
 
 
 def dataset_factory(params):
@@ -17,20 +28,37 @@ def dataset_factory(params):
             transform=torchvision.transforms.ToTensor(),
         )
     elif params["dataset_name"] == "voc_segmentation":
+        img_transform = transforms.Compose(
+            [
+                transforms.Resize((256, 256)),
+                transforms.ToTensor(),
+            ]
+        )
+
+        mask_transform = transforms.Compose(
+            [
+                transforms.Resize(
+                    (256, 256), interpolation=transforms.InterpolationMode.NEAREST
+                ),
+                transforms.ToTensor(),
+                lambda x: one_hot(x),
+            ]
+        )
+
         return torchvision.datasets.VOCSegmentation(
             root=INPUT_DIR,
             year="2012",
             image_set="train",
             download=True,
-            transform=torchvision.transforms.ToTensor(),
-            target_transform=torchvision.transforms.ToTensor(),
+            transform=img_transform,
+            target_transform=mask_transform,
         ), torchvision.datasets.VOCSegmentation(
             root=INPUT_DIR,
             year="2012",
             image_set="val",
             download=True,
-            transform=torchvision.transforms.ToTensor(),
-            target_transform=torchvision.transforms.ToTensor(),
+            transform=img_transform,
+            target_transform=mask_transform,
         )
     else:
         raise ValueError("Invalid dataset name")

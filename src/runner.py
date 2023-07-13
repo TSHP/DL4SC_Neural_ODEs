@@ -10,16 +10,22 @@ def run(config):
 
     optimizer = optimizer_factory(model.parameters(), config["optimizer"])
 
+    # Setup training module
     tm = None
     if config.get("mode") == "vae":
         tm = VAETrainingModule(model, optimizer, config["training"])
     elif config.get("mode") == "classification":
-        tm = ClassificationTrainingModule(model, optimizer, config["training"], config["model"]["out_dim"])
+        tm = ClassificationTrainingModule(
+            model, optimizer, config["training"], config["model"]["out_dim"]
+        )
     elif config.get("mode") == "segmentation":
-        tm = SegmentationTrainingModule(model, optimizer, config["training"])
+        tm = SegmentationTrainingModule(
+            model, optimizer, config["training"], config["model"]["out_dim"]
+        )
     else:
         raise ValueError("Invalid mode")
 
+    # Test all trained models
     model_tags = tm.fit(num_epochs=config["training"]["n_epochs"])
 
     for tag in model_tags:

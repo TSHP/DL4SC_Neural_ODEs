@@ -5,6 +5,7 @@ from torchdiffeq import odeint_adjoint, odeint
 
 from src.network.utils.model import norm, ConcatConv2d
 
+
 class ODEfunc(nn.Module):
     def __init__(self, dim, transpose=False):
         super(ODEfunc, self).__init__()
@@ -33,14 +34,14 @@ class ODEBlock(nn.Module):
         super(ODEBlock, self).__init__()
         self.odefunc = odefunc
 
-        # Set solver
+        # Set solver
         self.set_solver(adjoint=adjoint, rtol=rtol, atol=atol, method=method)
 
     def forward(self, x, t):
         t = t.type_as(x)
         out = self.solver(self.odefunc, x, t)
         return out[1]
-    
+
     def set_solver(self, adjoint=False, rtol=1e-7, atol=1e-9, method="dopri5"):
         if adjoint:
             self.solver = partial(odeint_adjoint, rtol=rtol, atol=atol, method=method)

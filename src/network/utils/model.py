@@ -36,7 +36,7 @@ class ConcatConv2d(nn.Module):
         tt = torch.ones_like(x[:, :1, :, :]) * t
         ttx = torch.cat([tt, x], 1)
         return self._layer(ttx)
-    
+
 
 class ResBlock(nn.Module):
     expansion = 1

@@ -6,7 +6,9 @@ from src.network.utils.node import ODEBlock, ODEfunc
 
 
 class NeuralVAE(nn.Module):
-    def __init__(self, latent_dim, adjoint=False, rtol=1e-7, atol=1e-9, method="dopri5"):
+    def __init__(
+        self, latent_dim, adjoint=False, rtol=1e-7, atol=1e-9, method="dopri5"
+    ):
         super(NeuralVAE, self).__init__()
 
         self.latent_dim = latent_dim
@@ -43,7 +45,9 @@ class NeuralVAE(nn.Module):
             ]
         )
 
-        self.node = ODEBlock(ODEfunc(64), adjoint=adjoint, rtol=rtol, atol=atol, method=method)
+        self.node = ODEBlock(
+            ODEfunc(64), adjoint=adjoint, rtol=rtol, atol=atol, method=method
+        )
         self.fc_mu = nn.Linear(64 * 36, self.latent_dim)
         self.fc_var = nn.Linear(64 * 36, self.latent_dim)
         self.decoder_input = nn.Linear(self.latent_dim, 64 * 36)
@@ -86,7 +90,7 @@ class NeuralVAE(nn.Module):
     def sample(self, num_samples):
         z = torch.randn(num_samples, self.latent_dim).to(self.device)
         return self.decoder(z)
-    
+
     def set_solver(self, adjoint=False, rtol=1e-7, atol=1e-9, method="dopri5"):
         self.node.set_solver(adjoint=adjoint, rtol=rtol, atol=atol, method=method)
 

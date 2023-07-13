@@ -2,7 +2,7 @@
 from src.visualizer import visualize_dataset, visualize_dataloader, visualize_results
 from src.loops import ModelTrainer
 from src.Data.get_dataset import download_VOC
-from src.Data.get_dataloader import get_dataloader 
+from src.Data.get_dataloader import get_dataloader
 from src.models.resnet_image import ResNet6_images, ResidualBlock
 from src.utils.dice_loss import dice_loss
 from src.models.node_image import ODENet
@@ -10,12 +10,13 @@ from src.models.rknet_image import RKNet
 
 # %%
 import torch
-if torch.cuda.is_available(): 
-    dev = "cuda" 
-else: 
+
+if torch.cuda.is_available():
+    dev = "cuda"
+else:
     dev = "cpu"
-    print("only cpu available") 
-device = torch.device(dev) 
+    print("only cpu available")
+device = torch.device(dev)
 
 # %%
 voc_trainset, voc_valset = download_VOC()
@@ -28,9 +29,9 @@ save = True
 
 # %%
 import numpy as np
+
 possible_val = np.empty((0))
 for i in range(len(voc_trainset)):
-
     image, mask = voc_trainset[i]
     possible_val = np.unique(np.append(possible_val, np.unique(mask)))
 print(possible_val)
@@ -53,21 +54,52 @@ if verbose:
 # %%
 import os
 import torch.nn as nn
+
 in_channels = 3
 out_channels = 21
 model_resnet = ResNet6_images(in_channels, out_channels).to(device)
 model_node = ODENet(in_channels, out_channels).to(device)
 model_rknet = RKNet(in_channels, out_channels).to(device)
-lossf = nn.BCELoss() 
+lossf = nn.BCELoss()
 learning_rate = 0.0001
 num_epochs = 50
 print_interval = 25
-model_filepath =  os.path.join(os.getcwd(), "src\\model_trained\\" ) 
+model_filepath = os.path.join(os.getcwd(), "src\\model_trained\\")
 
 # %%
-trainer_resnet = ModelTrainer(voc_train_loader, voc_val_loader, model_resnet, lossf, learning_rate, num_epochs, print_interval, os.path.join(model_filepath, "resnet.pt" ), device)
-trainer_node = ModelTrainer(voc_train_loader, voc_val_loader, model_node, lossf, learning_rate, num_epochs, print_interval, os.path.join(model_filepath, "node.pt"), device)
-trainer_rknet = ModelTrainer(voc_train_loader, voc_val_loader, model_rknet, lossf, learning_rate, num_epochs, print_interval, os.path.join(model_filepath, "rknet.pt"), device)
+trainer_resnet = ModelTrainer(
+    voc_train_loader,
+    voc_val_loader,
+    model_resnet,
+    lossf,
+    learning_rate,
+    num_epochs,
+    print_interval,
+    os.path.join(model_filepath, "resnet.pt"),
+    device,
+)
+trainer_node = ModelTrainer(
+    voc_train_loader,
+    voc_val_loader,
+    model_node,
+    lossf,
+    learning_rate,
+    num_epochs,
+    print_interval,
+    os.path.join(model_filepath, "node.pt"),
+    device,
+)
+trainer_rknet = ModelTrainer(
+    voc_train_loader,
+    voc_val_loader,
+    model_rknet,
+    lossf,
+    learning_rate,
+    num_epochs,
+    print_interval,
+    os.path.join(model_filepath, "rknet.pt"),
+    device,
+)
 
 # %%
 if load:
@@ -85,7 +117,7 @@ if run_tasks:
 # %%
 if run_tasks:
     trainer_resnet.test()
-    trainer_node.test() 
+    trainer_node.test()
     trainer_rknet.test()
 
 # %%
@@ -104,5 +136,3 @@ if verbose:
     print("rknet")
     visualize_results(predicts, masks)
     print("----------------------------")
-
-

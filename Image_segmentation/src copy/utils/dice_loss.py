@@ -1,4 +1,6 @@
 import torch
+
+
 def dice_loss(predicted, target):
     smooth = 1e-7  # A small constant to avoid division by zero
     intersection = torch.sum(predicted * target)

@@ -1,28 +1,24 @@
 import torch
-from torchmetrics import Accuracy
+from torchmetrics import JaccardIndex
 
 from src.training.abc_training_module import ABCTrainingModule
 
 
 class SegmentationTrainingModule(ABCTrainingModule):
-    def __init__(self, model, optimizer, params) -> None:
+    def __init__(self, model, optimizer, params, num_classes) -> None:
         super().__init__(model, optimizer, params)
-        self.num_classes = params["num_classes"]
+        self.num_classes = num_classes
         self.loss = torch.nn.CrossEntropyLoss()
-        self.accuracy = Accuracy(task="multiclass", num_classes=self.num_classes)
+        self.jaccard = JaccardIndex(task="multiclass", num_classes=self.num_classes).to(
+            self.device
+        )
 
-    def compute_loss(self, out, labels):
+    def compute_loss(self, inputs, labels):
+        out = self.model(inputs)
         return out, self.loss(out, labels)
-    
-    def compute_test_error(self, inputs, labels):
-        return 1 - self.accuracy(self.model(inputs), labels)
-    
+
+    def compute_mIoU(self, predictions, masks):
+        return self.jaccard(predictions, masks)
+
     def compute_metrics(self, inputs, labels):
-        return {
-            "Test Error": self.compute_test_error(inputs, labels)
-        }
-    
-    
-
-
-
+        return {"mIoU": self.compute_mIoU(inputs, labels)}

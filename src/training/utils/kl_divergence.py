@@ -5,10 +5,11 @@ from torch.nn.modules import Module
 class KLDivLoss(Module):
     r"""Computes the KL-divergence loss for VAE training.
 
-        Forward pass args:
-            - mu (tensor): Latent mean.
-            - log_var: Latent variance.
-        """
+    Forward pass args:
+        - mu (tensor): Latent mean.
+        - log_var: Latent variance.
+    """
+
     def __init__(self) -> None:
         super(KLDivLoss, self).__init__()
 
