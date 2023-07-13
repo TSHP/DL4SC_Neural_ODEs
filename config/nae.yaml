@@ -1,15 +1,16 @@
 experiment:
-  mode: autoencoder
+  mode: vae
   
   model:
-    network_name: nae
+    network_name: nvae
     latent_dim: 10
+
   
   training:
     n_epochs: 10
     batch_size: 128
     kl_strength: 1.e-3
-    output_path: ./output/nae
+    output_path: ./io/output/nvae
 
   optimizer:
     optimizer_name: adam

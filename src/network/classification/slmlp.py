@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 
@@ -6,15 +7,16 @@ class SLMLP(nn.Module):
         super(SLMLP, self).__init__()
         self.input_layer = nn.Linear(in_dim, hidden_dim)
         self.linear = nn.Linear(hidden_dim, out_dim)
-        self.Relu = nn.ReLU()
-
-    def get_num_params(self):
-        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+        self.relu = nn.ReLU()
 
     def forward(self, x):
-        x = x.reshape(-1, 28*28)
+        x = torch.flatten(x)
         out = self.input_layer(x)
-        out = self.Relu(out)
+        out = self.relu(out)
         out = self.linear(out)
-        out = self.Relu(out)
+        out = self.relu(out)
         return out
+    
+    @property
+    def num_params(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)

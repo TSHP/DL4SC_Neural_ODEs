@@ -1,4 +1,6 @@
 experiment:
+  mode: classification
+
   model:
     network_name: slmlp
     in_dim: 784
@@ -8,7 +10,7 @@ experiment:
   training:
     n_epochs: 30
     batch_size: 128
-    output_path: ./output/slmlp
+    output_path: ./io/output/slmlp
 
   optimizer:
     optimizer_name: adam

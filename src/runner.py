@@ -1,21 +1,23 @@
-from src.model import model_factory
-from src.optimizer import optimizer_factory
-from src.training_module import TrainingModule
-from src.ae_training_module import AETrainingModule
+from model import model_factory
+from optimizer import optimizer_factory
+from training.classification_training_module import ClassificationTrainingModule
+from training.vae_training_module import VAETrainingModule
 
 
 def run(config):
     model = model_factory(config["model"])
 
-    optimizer = optimizer_factory(
-        model.parameters(), config["optimizer"]
-    )
+    optimizer = optimizer_factory(model.parameters(), config["optimizer"])
 
     tm = None
-    if config.get("mode") == "autoencoder":
-        tm = AETrainingModule(model, optimizer, config["training"])
+    if config.get("mode") == "vae":
+        tm = VAETrainingModule(model, optimizer, config["training"])
+    elif config.get("mode") == "classification":
+        tm = ClassificationTrainingModule(model, optimizer, config["training"])
+    elif config.get("mode") == "segmentation":
+        tm = ClassificationTrainingModule(model, optimizer, config["training"])
     else:
-        tm = TrainingModule(model, optimizer, config["training"])
+        raise ValueError("Invalid mode")
 
     tm.fit(num_epochs=config["training"]["n_epochs"])
     tm.eval()

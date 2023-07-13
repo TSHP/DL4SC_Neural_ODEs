@@ -1,4 +1,6 @@
 experiment:
+  mode: classification
+
   model:
     network_name: resnet
     out_dim: 10
@@ -6,7 +8,7 @@ experiment:
   training:
     n_epochs: 30
     batch_size: 128
-    output_path: ./output/resnet
+    output_path: ./io/output/resnet
 
   optimizer:
     optimizer_name: adam

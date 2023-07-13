@@ -1,4 +1,6 @@
 experiment:
+  mode: classification
+
   model:
     network_name: odenet
     out_dim: 10
@@ -6,7 +8,7 @@ experiment:
   training:
     n_epochs: 10
     batch_size: 128
-    output_path: ./output/odenet
+    output_path: ./io/output/odenet
 
   optimizer:
     optimizer_name: adam

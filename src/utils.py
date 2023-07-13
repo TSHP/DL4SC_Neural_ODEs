@@ -23,6 +23,6 @@ def set_seed(seed: int):
 
 
 def kl_div(mu, log_var):
-    return torch.mean(-0.5 * torch.sum(1 + log_var - mu ** 2 - log_var.exp(), dim = 1), dim = 0)
-
-
+    return torch.mean(
+        -0.5 * torch.sum(1 + log_var - mu**2 - log_var.exp(), dim=1), dim=0
+    )
