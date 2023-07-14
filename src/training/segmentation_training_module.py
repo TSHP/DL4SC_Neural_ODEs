@@ -22,5 +22,7 @@ class SegmentationTrainingModule(ABCTrainingModule):
         return self.jaccard(torch.argmax(predictions, dim=1), torch.argmax(masks, dim=1))
 
     def compute_metrics(self, predictions, masks):
-        vizualize_segmentation_predictions(self.output_path / f"epoch_{self.epoch}_mask_gt.png", self.last_test_image_batch[-6:].cpu().numpy(), torch.argmax(masks[-6:], dim=1).cpu().numpy(), torch.argmax(predictions[-6:], dim=1).cpu().numpy())
+        batches = self.last_test_image_batch.shape[0] // 6
+        for i in range(batches):
+            vizualize_segmentation_predictions(self.output_path / f"epoch_{self.epoch}_mask_gt_p{i}.png", self.last_test_image_batch[6 * i:(i + 1) * 6].cpu().numpy(), torch.argmax(masks[6 * i:(i + 1) * 6], dim=1).cpu().numpy(), torch.argmax(predictions[6 * i:(i + 1) * 6], dim=1).cpu().numpy())
         return {"mIoU": self.compute_mIoU(predictions, masks)}
