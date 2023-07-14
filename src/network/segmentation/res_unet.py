@@ -7,7 +7,7 @@ from src.network.utils.model import ResBlock, upsample
 class ResUNet(nn.Module):
     def __init__(self, num_filters, kernel_size, out_dim):
         super(ResUNet, self).__init__()
-
+        
         # Encoder
         initial = ResBlock(
             [num_filters[0], num_filters[1]], kernel_size, strides=(1, 1), first_layer=True
@@ -61,6 +61,10 @@ class ResUNet(nn.Module):
             out = torch.cat([out, skip_features], dim=1)
             out = layer(out)
 
-        out = upsample(out, (256, 256))  # Read from params
+        out = upsample(out, (128, 128))  # Read from params
 
         return self.output(out)
+    
+    @property
+    def num_params(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)

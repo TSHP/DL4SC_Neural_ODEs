@@ -61,6 +61,10 @@ class ODEUNet(nn.Module):
             out = layer(out, torch.tensor([1, 0]).float().to(self.device))
             out = upsampler(out)
 
-        out = upsample(out, (256, 256))  # Read from params
+        out = upsample(out, (128, 128))  # Read from params
 
         return self.output(out)
+    
+    @property
+    def num_params(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)

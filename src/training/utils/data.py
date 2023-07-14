@@ -30,7 +30,7 @@ def dataset_factory(params):
     elif params["dataset_name"] == "voc_segmentation":
         img_transform = transforms.Compose(
             [
-                transforms.Resize((256, 256)),
+                transforms.Resize((128, 128)),
                 transforms.ToTensor(),
             ]
         )
@@ -38,7 +38,7 @@ def dataset_factory(params):
         mask_transform = transforms.Compose(
             [
                 transforms.Resize(
-                    (256, 256), interpolation=transforms.InterpolationMode.NEAREST
+                    (128, 128), interpolation=transforms.InterpolationMode.NEAREST
                 ),
                 transforms.ToTensor(),
                 lambda x: one_hot(x),

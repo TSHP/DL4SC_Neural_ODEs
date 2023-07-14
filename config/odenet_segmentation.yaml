@@ -5,7 +5,7 @@ experiment:
   model:
     network_name: odenet_segmentation
     kernel_size: 3
-    num_filters: [3, 32, 64, 128, 256]
+    num_filters: [3, 32, 64, 128]
     out_dim: 21
     adjoint: True
     rtol: 1.e-7
