@@ -7,7 +7,7 @@ class ResNet(nn.Module):
     def __init__(
         self,
         num_res_blocks=6,
-        num_filters=64,
+        num_filters=[64, 64],
         kernel_size=3,
         num_channels=1,
         out_dim=10,

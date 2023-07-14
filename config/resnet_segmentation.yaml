@@ -10,7 +10,7 @@ experiment:
   
   training:
     dataset_name: voc_segmentation
-    n_epochs: 30
+    n_epochs: 100
     batch_size: 128
     output_path: ./io/output/resnet_segmentation
 

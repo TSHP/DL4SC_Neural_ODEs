@@ -11,7 +11,7 @@ experiment:
   
   training:
     dataset_name: mnist
-    n_epochs: 10
+    n_epochs: 50
     batch_size: 128
     kl_weight: 1.e-3
     output_path: ./io/output/nvae

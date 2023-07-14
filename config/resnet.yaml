@@ -6,13 +6,13 @@ experiment:
     network_name: resnet
     num_res_blocks: 6
     kernel_size: 3
-    num_filters: 64
+    num_filters: [64, 64]
     num_channels: 1
     out_dim: 10
   
   training:
     dataset_name: mnist
-    n_epochs: 30
+    n_epochs: 100
     batch_size: 128
     output_path: ./io/output/resnet
 

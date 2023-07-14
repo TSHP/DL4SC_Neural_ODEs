@@ -10,7 +10,7 @@ experiment:
   
   training:
     dataset_name: mnist
-    n_epochs: 20
+    n_epochs: 100
     batch_size: 128
     output_path: ./io/output/mlp
 
