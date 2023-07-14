@@ -48,10 +48,10 @@ class ABCTrainingModule(ABC):
         self.model.to(self.device)
 
     def fit(self, num_epochs: int = 100):
-        best_val_loss = float("inf")
+        #best_val_loss = float("inf")
         train_loss_history = []
-        val_loss_history = []
-        val_metrics_history = []
+        #val_loss_history = []
+        #val_metrics_history = []
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
             self.epoch = cur_epoch
             running_loss = 0.0
@@ -62,23 +62,23 @@ class ABCTrainingModule(ABC):
                 running_loss += loss
                 train_loss_history.append(loss)
 
-            running_val_loss = 0.0
-            val_predictions = []
-            val_labels = []
-            with torch.no_grad():
-                for _, (images, labels) in enumerate(self.val_dataloader):
-                    images = images.to(self.device)
-                    labels = labels.to(self.device)
-                    out, loss = self.step(images, labels, eval=True)
-                    running_val_loss += loss
+            #running_val_loss = 0.0
+            #val_predictions = []
+            #val_labels = []
+            #with torch.no_grad():
+            #    for _, (images, labels) in enumerate(self.val_dataloader):
+            #        images = images.to(self.device)
+            #        labels = labels.to(self.device)
+            #        out, loss = self.step(images, labels, eval=True)
+            #        running_val_loss += loss
                     #val_predictions.append(out)
                     #val_labels.append(labels)
 
-                val_loss_history.append(running_val_loss)
-                self.last_test_image_batch = images
+            #    val_loss_history.append(running_val_loss)
+            #    self.last_test_image_batch = images
 
             # Show metrics in pbar
-            pbar_description = f"Epoch[{cur_epoch + 1}/{num_epochs}], Loss: {running_loss / len(self.train_dataloader):.4f}, Val Loss: {running_val_loss / len(self.val_dataloader):.4f}"
+            pbar_description = f"Epoch[{cur_epoch + 1}/{num_epochs}], Loss: {running_loss / len(self.train_dataloader):.4f}"
             #val_metrics = self.compute_metrics(
             #    torch.cat(val_predictions, 0), torch.cat(val_labels, 0)
             #)
@@ -88,9 +88,11 @@ class ABCTrainingModule(ABC):
             pbar_epoch.set_description(pbar_description)
 
             # Save best models, hack for reducing io
-            if running_val_loss < best_val_loss and cur_epoch % 50:
-                best_val_loss = running_val_loss
-                self.save_model(f"snapshot{cur_epoch}")
+            if cur_epoch % 10 and cur_epoch > 0:
+#                best_val_loss = running_val_loss
+                print("Val ")
+                self.save_model(f"snapshot{cur_epoch}_model.pt")
+                self.test(f"snapshot{cur_epoch}")
 
             #for k, v in val_metrics.items():
             #    self.save_model(f"best_val_{k.replace(' ', '_')}")
@@ -99,10 +101,10 @@ class ABCTrainingModule(ABC):
         np.save(
             self.output_path / "train_loss_history.npy", np.array(train_loss_history)
         )
-        np.save(self.output_path / "val_loss_history.npy", np.array(val_loss_history))
-        np.save(
-            self.output_path / "val_metrics_history.npy", np.array(val_metrics_history)
-        )
+        #np.save(self.output_path / "val_loss_history.npy", np.array(val_loss_history))
+        #np.save(
+        #    self.output_path / "val_metrics_history.npy", np.array(val_metrics_history)
+        #)
 
         self.save_model("last")
         #return ["last", "best_val"] + [

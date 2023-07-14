@@ -12,7 +12,7 @@ experiment:
   
   training:
     dataset_name: mnist
-    n_epochs: 100
+    n_epochs: 50
     batch_size: 128
     output_path: ./io/output/odenet
 
