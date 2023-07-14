@@ -71,21 +71,21 @@ class ABCTrainingModule(ABC):
                     labels = labels.to(self.device)
                     out, loss = self.step(images, labels, eval=True)
                     running_val_loss += loss
-                    val_predictions.append(out)
-                    val_labels.append(labels)
+                    #val_predictions.append(out)
+                    #val_labels.append(labels)
 
                 val_loss_history.append(running_val_loss)
                 self.last_test_image_batch = images
 
             # Show metrics in pbar
             pbar_description = f"Epoch[{cur_epoch + 1}/{num_epochs}], Loss: {running_loss / len(self.train_dataloader):.4f}, Val Loss: {running_val_loss / len(self.val_dataloader):.4f}"
-            val_metrics = self.compute_metrics(
-                torch.cat(val_predictions, 0), torch.cat(val_labels, 0)
-            )
-            val_metrics_history.append(val_metrics)
-            for k, v in val_metrics.items():
-                pbar_description += f", Val {k}: {v:.4f}"
-            pbar_epoch.set_description(pbar_description)
+            #val_metrics = self.compute_metrics(
+            #    torch.cat(val_predictions, 0), torch.cat(val_labels, 0)
+            #)
+            #val_metrics_history.append(val_metrics)
+            #for k, v in val_metrics.items():
+            #    pbar_description += f", Val {k}: {v:.4f}"
+            #pbar_epoch.set_description(pbar_description)
 
             # Save best models, hack for reducing io
             if running_val_loss < best_val_loss and cur_epoch % 50:
