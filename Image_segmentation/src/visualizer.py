@@ -74,17 +74,17 @@ def visualize_results(predicts, masks):
     grid_masks = make_grid(masks)
 
     # Convert tensors to numpy arrays
-    grid_images_np = grid_images.numpy().transpose(1, 2, 0)
-    grid_masks_np = grid_masks.numpy().transpose(1, 2, 0)
+    grid_images_np = grid_images[0,:,:].numpy()
+    grid_masks_np = grid_masks[0,:,:].numpy()
 
     # Display the grid of images and masks
     plt.subplot(1, 2, 1)
-    plt.imshow(grid_images_np[:, :, 0])
+    plt.imshow(grid_images_np, cmap="jet",vmin=0, vmax=20)
     plt.title("Predictions")
     plt.axis("off")
 
     plt.subplot(1, 2, 2)
-    plt.imshow(grid_masks_np[:, :, 0])
+    plt.imshow(grid_masks_np, cmap="jet",vmin=0, vmax=20)
     plt.title("Masks")
     plt.axis("off")
 
