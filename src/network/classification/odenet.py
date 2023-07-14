@@ -11,6 +11,7 @@ class ODENet(nn.Module):
 
         self.relu = nn.ReLU(inplace=True)
         self.norm = norm(64)
+        self.flatten = nn.Flatten()
 
         self.device = torch.device("cpu")
         if torch.cuda.is_available():
@@ -39,7 +40,7 @@ class ODENet(nn.Module):
         out = self.norm(out)
         out = self.relu(out)
         out = self.adaptive_pool(out)
-        out = torch.flatten(out)
+        out = self.flatten(out)
         out = self.fc(out)
 
         return out
