@@ -19,7 +19,7 @@ class SegmentationTrainingModule(ABCTrainingModule):
         return out, self.loss(out, torch.argmax(masks, dim=1))
 
     def compute_mIoU(self, predictions, masks):
-        return self.jaccard(torch.argmax(predictions, dim=1), torch.argmax(masks, dim=1))
+        return self.jaccard(torch.argmax(predictions, dim=1), torch.argmax(masks, dim=1)).item()
 
     def compute_metrics(self, predictions, masks):
         length = self.last_test_image_batch.shape[0]
