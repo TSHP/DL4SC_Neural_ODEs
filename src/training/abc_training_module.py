@@ -16,6 +16,7 @@ class ABCTrainingModule(ABC):
         self.optimizer = optimizer
         self.batch_size = params.get("batch_size", 32)
         self.epoch = 0
+        self.last_test_image_batch = None
 
         # Load dataset
         self.dataset, self.test_dataset = dataset_factory(params)
@@ -125,6 +126,8 @@ class ABCTrainingModule(ABC):
                 running_test_loss += loss
                 test_predictions.append(out)
                 test_lables.append(labels)
+
+            self.last_test_image_batch = images
 
         test_metrics = self.compute_metrics(
             torch.cat(test_predictions, 0), torch.cat(test_lables, 0)

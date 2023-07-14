@@ -1,6 +1,8 @@
 import torch
+import torchvision
 from torchmetrics import JaccardIndex
 
+from src.viz import vizualize_segmentation_predictions
 from src.training.abc_training_module import ABCTrainingModule
 
 
@@ -21,4 +23,5 @@ class SegmentationTrainingModule(ABCTrainingModule):
         return self.jaccard(predictions, masks)
 
     def compute_metrics(self, predictions, masks):
+        vizualize_segmentation_predictions(self.output_path / f"epoch_{self.epoch}_mask_gt.png", self.last_test_image_batch[-6:], masks[-6:].cpu().numpy(), torch.argmax(predictions[-6:], dim=1).cpu().numpy())
         return {"mIoU": self.compute_mIoU(predictions, masks)}
