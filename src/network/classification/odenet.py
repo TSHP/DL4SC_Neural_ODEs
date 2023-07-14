@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 
-from src.network.utils.model import norm
-from src.network.utils.node import ODEBlock, ODEfunc
+from src.network.utils.node import AdjointODEBlock, ODEBlock, ODEfunc
 
 
 class ODENet(nn.Module):
@@ -10,7 +9,7 @@ class ODENet(nn.Module):
         super(ODENet, self).__init__()
 
         self.relu = nn.ReLU(inplace=True)
-        self.norm = norm(64)
+        self.bn = nn.BatchNorm2d(64)
         self.flatten = nn.Flatten()
 
         self.device = torch.device("cpu")
@@ -20,16 +19,16 @@ class ODENet(nn.Module):
         self.downsampling_layer = nn.Sequential(
             *[
                 nn.Conv2d(1, 64, 3, 1),
-                self.norm,
+                self.bn,
                 self.relu,
                 nn.Conv2d(64, 64, 4, 2, 1),
-                self.norm,
+                self.bn,
                 self.relu,
                 nn.Conv2d(64, 64, 4, 2, 1),
             ]
         )
 
-        self.node = ODEBlock(ODEfunc(64), adjoint=adjoint, rtol=rtol, atol=atol, method=method)
+        self.node = ODEBlock(ODEfunc(64), rtol=rtol, atol=atol, method=method) if not adjoint else AdjointODEBlock(ODEfunc(64), rtol=rtol, atol=atol, method=method)
         self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(64, out_dim)
 
@@ -37,7 +36,7 @@ class ODENet(nn.Module):
         out = self.downsampling_layer(x)
         out = self.node(out, torch.tensor([1, 0]).float().to(self.device))
 
-        out = self.norm(out)
+        out = self.bn(out)
         out = self.relu(out)
         out = self.adaptive_pool(out)
         out = self.flatten(out)

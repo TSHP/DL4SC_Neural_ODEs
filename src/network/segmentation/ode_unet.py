@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from src.network.utils.model import upsample
-from src.network.utils.node import ODEfunc, ODEBlock
+from src.network.utils.node import ODEfunc, ODEBlock, AdjointODEBlock
 from src.network.utils.model import ResBlock
 
 
@@ -20,7 +20,7 @@ class ODEUNet(nn.Module):
         )
         self.encoder = nn.Sequential(
             *([
-                    ODEBlock(ODEfunc(num_filters[i]), adjoint=adjoint, rtol=rtol, atol=atol, method=method)
+                    ODEBlock(ODEfunc(num_filters[i]), rtol=rtol, atol=atol, method=method) if not adjoint else AdjointODEBlock(ODEfunc(num_filters[i]), rtol=rtol, atol=atol, method=method)
                     for i in range(1, len(num_filters) - 1)
                 ]
             )
@@ -29,13 +29,13 @@ class ODEUNet(nn.Module):
         self.downsamplers = nn.Sequential(*[nn.Conv2d(num_filters[i], num_filters[i+1], kernel_size=3, padding=1, stride=2) for i in range(1, len(num_filters) - 1)])
 
         # Bridge
-        self.bridge = ODEBlock(ODEfunc(num_filters[-1]), adjoint=adjoint, rtol=rtol, atol=atol, method=method)
+        self.bridge = ODEBlock(ODEfunc(num_filters[-1]), rtol=rtol, atol=atol, method=method) if not adjoint else AdjointODEBlock(ODEfunc(num_filters[-1]), rtol=rtol, atol=atol, method=method)
 
         # Decoder
         self.decoder = nn.Sequential(
             *(
                 [
-                    ODEBlock(ODEfunc(num_filters[-i] * 2), adjoint=adjoint, rtol=rtol, atol=atol, method=method)
+                    ODEBlock(ODEfunc(num_filters[-i] * 2), rtol=rtol, atol=atol, method=method) if not adjoint else AdjointODEBlock(ODEfunc(num_filters[-i] * 2), rtol=rtol, atol=atol, method=method)
                     for i in range(1, len(num_filters) - 1)
                 ]
             )

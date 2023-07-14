@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 
-from src.network.utils.model import norm
-from src.network.utils.node import ODEBlock, ODEfunc
+from src.network.utils.node import AdjointODEBlock, ODEBlock, ODEfunc
 
 
 class NeuralVAE(nn.Module):
@@ -18,16 +17,16 @@ class NeuralVAE(nn.Module):
             self.device = torch.device("cuda")
 
         self.relu = nn.ReLU(inplace=True)
-        self.norm = norm(64)
+        self.bn = nn.BatchNorm2d(64)
         self.flatten = nn.Flatten()
 
         self.downsampling_layer = nn.Sequential(
             *[
                 nn.Conv2d(1, 64, 3, 1),
-                self.norm,
+                self.bn,
                 self.relu,
                 nn.Conv2d(64, 64, 4, 2, 1),
-                self.norm,
+                self.bn,
                 self.relu,
                 nn.Conv2d(64, 64, 4, 2, 1),
             ]
@@ -36,18 +35,16 @@ class NeuralVAE(nn.Module):
         self.upsampling_layer = nn.Sequential(
             *[
                 nn.ConvTranspose2d(64, 64, 4, 2, 1, 0),
-                self.norm,
+                self.bn,
                 self.relu,
                 nn.ConvTranspose2d(64, 64, 4, 2, 0, 0),
-                self.norm,
+                self.bn,
                 self.relu,
                 nn.ConvTranspose2d(64, 1, 3, 1, 0, 0),
             ]
         )
 
-        self.node = ODEBlock(
-            ODEfunc(64), adjoint=adjoint, rtol=rtol, atol=atol, method=method
-        )
+        self.node = ODEBlock(ODEfunc(64), rtol=rtol, atol=atol, method=method) if not adjoint else AdjointODEBlock(ODEfunc(64), rtol=rtol, atol=atol, method=method)
         self.fc_mu = nn.Linear(64 * 36, self.latent_dim)
         self.fc_var = nn.Linear(64 * 36, self.latent_dim)
         self.decoder_input = nn.Linear(self.latent_dim, 64 * 36)
