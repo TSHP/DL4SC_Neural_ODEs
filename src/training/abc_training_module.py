@@ -85,7 +85,7 @@ class ABCTrainingModule(ABC):
             #val_metrics_history.append(val_metrics)
             #for k, v in val_metrics.items():
             #    pbar_description += f", Val {k}: {v:.4f}"
-            #pbar_epoch.set_description(pbar_description)
+            pbar_epoch.set_description(pbar_description)
 
             # Save best models, hack for reducing io
             if running_val_loss < best_val_loss and cur_epoch % 50:
