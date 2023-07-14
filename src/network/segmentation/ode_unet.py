@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 
-from src.network.utils.model import InitialResBlock, upsample
+from src.network.utils.model import upsample
 from src.network.utils.node import ODEfunc, ODEBlock
+from src.network.utils.model import ResBlock
 
 
 class ODEUNet(nn.Module):
@@ -14,8 +15,8 @@ class ODEUNet(nn.Module):
             self.device = torch.device("cuda")
 
         # Encoder
-        self.initial = InitialResBlock(
-            [num_filters[0], num_filters[1]], kernel_size, strides=(1, 1)
+        self.initial = ResBlock( # TODO replace or leave
+            [num_filters[0], num_filters[1]], kernel_size, strides=(1, 1), first_layer=True
         )
         self.encoder = nn.Sequential(
             *([

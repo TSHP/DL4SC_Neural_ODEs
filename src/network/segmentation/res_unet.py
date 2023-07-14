@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from src.network.utils.model import InitialResBlock, ResBlock, upsample
+from src.network.utils.model import ResBlock, upsample
 
 
 class ResUNet(nn.Module):
@@ -9,8 +9,8 @@ class ResUNet(nn.Module):
         super(ResUNet, self).__init__()
 
         # Encoder
-        initial = InitialResBlock(
-            [num_filters[0], num_filters[1]], kernel_size, strides=(1, 1)
+        initial = ResBlock(
+            [num_filters[0], num_filters[1]], kernel_size, strides=(1, 1), first_layer=True
         )
         self.encoder = nn.Sequential(
             *(
