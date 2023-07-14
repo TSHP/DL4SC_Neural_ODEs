@@ -48,6 +48,6 @@ def get_dataloader(voc_dataset, out_size=32, batch_size=32):
     dataset = CustomVOCDataset(voc_dataset, transform_image=transform_image,
                             transform_mask=transform_mask)
 
-    VOC_data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+    VOC_data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=0)
 
     return VOC_data_loader

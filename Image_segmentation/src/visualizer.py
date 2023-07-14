@@ -68,6 +68,7 @@ def visualize_results(predicts, masks):
     masks = torch.tensor(masks[0])
     
     predicts = torch.argmax(predicts, dim=1, keepdim=True)
+    masks = torch.argmax(masks, dim=1, keepdim=True)
 
     grid_images = make_grid(predicts)
     grid_masks = make_grid(masks)
