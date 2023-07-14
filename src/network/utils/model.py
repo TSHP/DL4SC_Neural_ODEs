@@ -70,7 +70,9 @@ class ResBlock(nn.Module):
         out = self.relu(out)
         out = self.conv2(out)
 
-        x = nn.Conv2d(self.num_filters[0], self.num_filters[1], kernel_size=1, stride=self.strides)(x)
+        x = nn.Conv2d(
+            self.num_filters[0], self.num_filters[1], kernel_size=1, stride=self.strides
+        )(x)
         x = nn.BatchNorm2d(self.num_filters[1])(x)
 
         return out + x
@@ -103,7 +105,9 @@ class InitialResBlock(nn.Module):
         out = self.relu(out)
         out = self.conv2(out)
 
-        x = nn.Conv2d(self.num_filters[0], self.num_filters[1], kernel_size=1, stride=1)(x)
+        x = nn.Conv2d(
+            self.num_filters[0], self.num_filters[1], kernel_size=1, stride=1
+        )(x)
         x = nn.BatchNorm2d(self.num_filters[1])(x)
 
         return out + x

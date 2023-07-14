@@ -16,20 +16,30 @@ class ResUNet(nn.Module):
             *(
                 [initial]
                 + [
-                    ResBlock([num_filters[i], num_filters[i+1]], kernel_size, strides=(2, 2))
+                    ResBlock(
+                        [num_filters[i], num_filters[i + 1]],
+                        kernel_size,
+                        strides=(2, 2),
+                    )
                     for i in range(1, len(num_filters) - 1)
                 ]
             )
         )
 
         # Bridge
-        self.bridge = ResBlock([num_filters[-1], num_filters[-1]], kernel_size, strides=(1, 1))
+        self.bridge = ResBlock(
+            [num_filters[-1], num_filters[-1]], kernel_size, strides=(1, 1)
+        )
 
         # Decoder
         self.decoder = nn.Sequential(
             *(
                 [
-                    ResBlock([num_filters[-i] * 2, num_filters[-i-1]], kernel_size, strides=(1, 1))
+                    ResBlock(
+                        [num_filters[-i] * 2, num_filters[-i - 1]],
+                        kernel_size,
+                        strides=(1, 1),
+                    )
                     for i in range(1, len(num_filters) - 1)
                 ]
             )
@@ -51,6 +61,6 @@ class ResUNet(nn.Module):
             out = torch.cat([out, skip_features], dim=1)
             out = layer(out)
 
-        out = upsample(out, (256, 256)) # Read from params
+        out = upsample(out, (256, 256))  # Read from params
 
         return self.output(out)

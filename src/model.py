@@ -40,7 +40,7 @@ def model_factory(params):
         return ResUNet(
             num_filters=params["num_filters"],
             kernel_size=params["kernel_size"],
-            #in_channels=params["in_channels"],
+            # in_channels=params["in_channels"],
             out_dim=params["out_dim"],
         )
     # ODE-Net for segmentation

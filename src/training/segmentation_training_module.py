@@ -17,7 +17,7 @@ class SegmentationTrainingModule(ABCTrainingModule):
         out = self.model(inputs)
         return out, self.loss(out, masks)
 
-    def compute_mIoU(self, predictions, masks, gt_images):
+    def compute_mIoU(self, predictions, masks):
         return self.jaccard(predictions, masks)
 
     def compute_metrics(self, predictions, masks):

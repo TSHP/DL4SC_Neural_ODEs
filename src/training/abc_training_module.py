@@ -64,7 +64,6 @@ class ABCTrainingModule(ABC):
             running_val_loss = 0.0
             val_predictions = []
             val_labels = []
-            val_images = []
             with torch.no_grad():
                 for _, (images, labels) in enumerate(self.val_dataloader):
                     images = images.to(self.device)
@@ -73,14 +72,13 @@ class ABCTrainingModule(ABC):
                     running_val_loss += loss
                     val_predictions.append(out)
                     val_labels.append(labels)
-                    val_images.append(images)
 
                 val_loss_history.append(running_val_loss)
 
             # Show metrics in pbar
             pbar_description = f"Epoch[{cur_epoch + 1}/{num_epochs}], Loss: {running_loss / len(self.train_dataloader):.4f}, Val Loss: {running_val_loss / len(self.val_dataloader):.4f}"
             val_metrics = self.compute_metrics(
-                torch.cat(val_predictions, 0), torch.cat(val_labels, 0), torch.cat(val_images, 0)
+                torch.cat(val_predictions, 0), torch.cat(val_labels, 0)
             )
             val_metrics_history.append(val_metrics)
             for k, v in val_metrics.items():
@@ -118,7 +116,6 @@ class ABCTrainingModule(ABC):
         running_test_loss = 0.0
         test_predictions = []
         test_lables = []
-        test_images = []
 
         with torch.no_grad():
             for _, (images, labels) in enumerate(self.test_dataloader):
@@ -128,10 +125,9 @@ class ABCTrainingModule(ABC):
                 running_test_loss += loss
                 test_predictions.append(out)
                 test_lables.append(labels)
-                test_images.append(images)
 
         test_metrics = self.compute_metrics(
-            torch.cat(test_predictions, 0), torch.cat(test_lables, 0), torch.cat(test_images, 0)
+            torch.cat(test_predictions, 0), torch.cat(test_lables, 0)
         )
 
         # Save metrics

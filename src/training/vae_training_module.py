@@ -12,23 +12,33 @@ class VAETrainingModule(ABCTrainingModule):
         self.loss = torch.nn.MSELoss()
         self.kl_loss = KLDivLoss()
         self.kl_weight = params["kl_weight"]
-        self.fid = FrechetInceptionDistance(feature=64, reset_real_features=True).to(self.device)
+
+        test_images = []
+        for images, _ in self.val_dataloader:
+            test_images.append(images)
+
+        self.fid = FrechetInceptionDistance(feature=64)
+        self.fid.update(torch.cat(test_images, 0), real=True)
 
     def compute_loss(self, inputs, labels):
         out, mu, log_var = self.model(inputs)
         return out, self.loss(out, inputs) + self.kl_weight * self.kl_loss(mu, log_var)
-    
+
     def compute_fid(self, generated, real):
         self.fid.update(real, real=True)
         self.fid.update(generated, real=False)
         return self.fid.compute()
 
-    def compute_metrics(self, predictions, labels, gt_images):
+    def compute_metrics(self, predictions, labels):
         generated = self.model.sample(1000)
-        fid_score = self.compute_fid(generated, gt_images)
-        self.fid.reset()
+        self.fid.update(generated, real=False)
+        fid_score = self.fid.compute()
+        self.val_fid.reset()
+
         torchvision.utils.save_image(
-            generated[:30].cpu(), self.output_path / f"epoch_{self.epoch}_samples.png", nrow=10
+            generated[:30].cpu(),
+            self.output_path / f"epoch_{self.epoch}_samples.png",
+            nrow=10,
         )
         return {"FID": fid_score}
 
