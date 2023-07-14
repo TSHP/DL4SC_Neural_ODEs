@@ -75,6 +75,7 @@ class ABCTrainingModule(ABC):
                     val_labels.append(labels)
 
                 val_loss_history.append(running_val_loss)
+                self.last_test_image_batch = images
 
             # Show metrics in pbar
             pbar_description = f"Epoch[{cur_epoch + 1}/{num_epochs}], Loss: {running_loss / len(self.train_dataloader):.4f}, Val Loss: {running_val_loss / len(self.val_dataloader):.4f}"
