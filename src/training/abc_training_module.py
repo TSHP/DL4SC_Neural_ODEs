@@ -87,13 +87,13 @@ class ABCTrainingModule(ABC):
                 pbar_description += f", Val {k}: {v:.4f}"
             pbar_epoch.set_description(pbar_description)
 
-            # Save best models
-            if running_val_loss < best_val_loss:
+            # Save best models, hack for reducing io
+            if running_val_loss < best_val_loss and cur_epoch % 50:
                 best_val_loss = running_val_loss
-                self.save_model("best_val")
+                self.save_model(f"snapshot{cur_epoch}")
 
-            for k, v in val_metrics.items():
-                self.save_model(f"best_val_{k.replace(' ', '_')}")
+            #for k, v in val_metrics.items():
+            #    self.save_model(f"best_val_{k.replace(' ', '_')}")
 
         # Save histories as numpy arrays
         np.save(
@@ -105,9 +105,10 @@ class ABCTrainingModule(ABC):
         )
 
         self.save_model("last")
-        return ["last", "best_val"] + [
-            f"best_val_{k.replace(' ', '_')}" for k, _ in val_metrics.items()
-        ]
+        #return ["last", "best_val"] + [
+        #    f"best_val_{k.replace(' ', '_')}" for k, _ in val_metrics.items()
+        #]
+        return ["last"]
 
     def test(self, model_tag):
         """Test the model and save the results"""
