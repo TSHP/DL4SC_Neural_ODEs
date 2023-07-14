@@ -58,7 +58,7 @@ class ABCTrainingModule(ABC):
             for _, (images, labels) in enumerate(self.train_dataloader):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
-                _, loss = self.step(images, labels)
+                out, loss = self.step(images, labels)
                 running_loss += loss
                 train_loss_history.append(loss)
 

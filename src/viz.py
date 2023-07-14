@@ -50,4 +50,4 @@ def vizualize_segmentation_predictions(save_path: Path, images: np.ndarray, gts:
 
 
     plt.tight_layout()
-    plt.savefig(save_path, format='eps')
+    plt.savefig(save_path)

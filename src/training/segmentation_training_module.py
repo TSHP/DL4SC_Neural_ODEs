@@ -1,5 +1,4 @@
 import torch
-import torchvision
 from torchmetrics import JaccardIndex
 
 from src.viz import vizualize_segmentation_predictions
@@ -20,8 +19,8 @@ class SegmentationTrainingModule(ABCTrainingModule):
         return out, self.loss(out, masks)
 
     def compute_mIoU(self, predictions, masks):
-        return self.jaccard(predictions, masks)
+        return self.jaccard(torch.argmax(predictions, dim=1), torch.argmax(masks, dim=1))
 
     def compute_metrics(self, predictions, masks):
-        vizualize_segmentation_predictions(self.output_path / f"epoch_{self.epoch}_mask_gt.png", self.last_test_image_batch[-6:].cpu().numpy(), masks[-6:].cpu().numpy(), torch.argmax(predictions[-6:], dim=1).cpu().numpy())
+        vizualize_segmentation_predictions(self.output_path / f"epoch_{self.epoch}_mask_gt.png", self.last_test_image_batch[-6:].cpu().numpy(), torch.argmax(masks[-6:], dim=1).cpu().numpy(), torch.argmax(predictions[-6:], dim=1).cpu().numpy())
         return {"mIoU": self.compute_mIoU(predictions, masks)}

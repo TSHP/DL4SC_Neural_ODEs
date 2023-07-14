@@ -1,18 +1,19 @@
 import torch
 import torch.nn.functional as F
 
+import numpy as np
+
 import torchvision
 import torchvision.transforms as transforms
 
 from src.constants import INPUT_DIR
 
-
 def one_hot(x):
-    x[x == 255] = 0
-    x = F.one_hot(x.to(torch.int64), 21).permute(0, 3, 2, 1).to(torch.float)
-    x = torch.squeeze(x)
-    return x
-
+    encoded = np.asarray(x).copy()
+    encoded[encoded == 255] = 0
+    encoded = F.one_hot(torch.tensor(encoded).to(torch.int64), 21).permute(2, 0, 1).squeeze().to(torch.float)
+    #reshaped = encoded.transpose(0, 3).to(torch.float).squeeze(-1)
+    return encoded
 
 def dataset_factory(params):
     if params["dataset_name"] == "mnist":
@@ -40,8 +41,7 @@ def dataset_factory(params):
                 transforms.Resize(
                     (128, 128), interpolation=transforms.InterpolationMode.NEAREST
                 ),
-                transforms.ToTensor(),
-                lambda x: one_hot(x),
+                lambda x: one_hot(x)
             ]
         )
 
