@@ -36,7 +36,7 @@ class ResUNet(nn.Module):
             *(
                 [
                     ResBlock(
-                        [num_filters[-i] * 2, num_filters[-i - 1]],
+                        [num_filters[-i] * 2, num_filters[-i-1]],
                         kernel_size,
                         strides=(1, 1),
                     )
