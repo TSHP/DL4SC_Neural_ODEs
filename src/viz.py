@@ -36,7 +36,7 @@ def vizualize_segmentation_predictions(save_path: Path, images: np.ndarray, gts:
     for i, image in enumerate(images):
         ax1 = plt.subplot(gs1[0, i], xticks=[], yticks=[])
         ax1.set_aspect("auto")
-        ax1.imshow(image.permute(1, 2, 0))
+        ax1.imshow(np.transpose(image, (1, 2, 0)))
 
     for i, gt in enumerate(gts):
         ax1 = plt.subplot(gs1[1, i], xticks=[], yticks=[])
