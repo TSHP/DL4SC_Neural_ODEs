@@ -47,6 +47,9 @@ class ABCTrainingModule(ABC):
         print("Using device:", self.device)
         self.model.to(self.device)
 
+        print("Number of parameters:", self.model.num_params)
+
+
     def fit(self, num_epochs: int = 100):
         #best_val_loss = float("inf")
         train_loss_history = []
@@ -88,10 +91,9 @@ class ABCTrainingModule(ABC):
             pbar_epoch.set_description(pbar_description)
 
             # Save best models, hack for reducing io
-            if cur_epoch % 10 and cur_epoch > 0:
-#                best_val_loss = running_val_loss
-                print("Val ")
-                self.save_model(self.output_path / f"snapshot{cur_epoch}_model.pt")
+            if cur_epoch % 10 == 0 and cur_epoch > 0:
+#               best_val_loss = running_val_loss
+                self.save_model(f"snapshot{cur_epoch}")
                 self.test(f"snapshot{cur_epoch}")
 
             #for k, v in val_metrics.items():
