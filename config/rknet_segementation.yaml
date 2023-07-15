@@ -7,10 +7,10 @@ experiment:
     kernel_size: 3
     num_filters: [3, 32]
     out_dim: 21
-    adjoint: True
+    adjoint: False
     rtol: 1.e-7
     atol: 1.e-9 
-    method: dopri5
+    method: rk4
   
   training:
     dataset_name: voc_segmentation

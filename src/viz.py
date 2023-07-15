@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import torch
+from torchvision.utils import make_grid
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -48,6 +50,36 @@ def vizualize_segmentation_predictions(save_path: Path, images: np.ndarray, gts:
         ax1.set_aspect("auto")
         ax1.imshow(color_mask(prediction))
 
+
+    plt.tight_layout()
+    plt.savefig(save_path)
+
+
+def visualize_results(save_path, predicts, masks):
+    
+    predicts = torch.tensor(predicts[0])
+    masks = torch.tensor(masks[0])
+    
+    predicts = torch.argmax(predicts, dim=1, keepdim=True)
+    masks = torch.argmax(masks, dim=1, keepdim=True)
+
+    grid_images = make_grid(predicts)
+    grid_masks = make_grid(masks)
+
+    # Convert tensors to numpy arrays
+    grid_images_np = grid_images[0,:,:].numpy()
+    grid_masks_np = grid_masks[0,:,:].numpy()
+
+    # Display the grid of images and masks
+    plt.subplot(1, 2, 1)
+    plt.imshow(grid_images_np, cmap="jet",vmin=0, vmax=20)
+    plt.title("Predictions")
+    plt.axis("off")
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(grid_masks_np, cmap="jet",vmin=0, vmax=20)
+    plt.title("Masks")
+    plt.axis("off")
 
     plt.tight_layout()
     plt.savefig(save_path)

@@ -17,7 +17,7 @@ class VAETrainingModule(ABCTrainingModule):
         return out, self.loss(out, inputs) + self.kl_weight * self.kl_loss(mu, log_var)
 
     def compute_metrics(self, predictions, labels):
-        generated = self.model.sample(30)
+        generated = self.model.sample(10)
         torchvision.utils.save_image(
             generated.cpu(),
             self.output_path / f"epoch_{self.epoch}_samples.png",

@@ -21,4 +21,4 @@ class ClassificationTrainingModule(ABCTrainingModule):
         return (1 - self.accuracy(predictions, labels)).item()
 
     def compute_metrics(self, predictions, labels):
-        return {"Test Error": self.compute_test_error(predictions, labels)}
+        return {"Error": self.compute_test_error(predictions, labels)}

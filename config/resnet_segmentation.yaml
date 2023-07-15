@@ -5,7 +5,7 @@ experiment:
   model:
     network_name: resnet_segmentation
     kernel_size: 3
-    num_filters: [3, 32, 64, 128]
+    num_filters: [3, 32]
     out_dim: 21
   
   training:

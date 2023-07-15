@@ -51,10 +51,10 @@ class ABCTrainingModule(ABC):
 
 
     def fit(self, num_epochs: int = 100):
-        #best_val_loss = float("inf")
+        best_val_loss = float("inf")
         train_loss_history = []
-        #val_loss_history = []
-        #val_metrics_history = []
+        val_loss_history = []
+        val_metrics_history = []
         for cur_epoch in (pbar_epoch := tqdm(range(num_epochs))):
             self.epoch = cur_epoch
             running_loss = 0.0
@@ -65,54 +65,55 @@ class ABCTrainingModule(ABC):
                 running_loss += loss
                 train_loss_history.append(loss)
 
-            #running_val_loss = 0.0
-            #val_predictions = []
-            #val_labels = []
-            #with torch.no_grad():
-            #    for _, (images, labels) in enumerate(self.val_dataloader):
-            #        images = images.to(self.device)
-            #        labels = labels.to(self.device)
-            #        out, loss = self.step(images, labels, eval=True)
-            #        running_val_loss += loss
-                    #val_predictions.append(out)
-                    #val_labels.append(labels)
+            running_val_loss = 0.0
+            val_predictions = []
+            val_labels = []
+            with torch.no_grad():
+                for _, (images, labels) in enumerate(self.val_dataloader):
+                    images = images.to(self.device)
+                    labels = labels.to(self.device)
+                    out, loss = self.step(images, labels, eval=True)
+                    running_val_loss += loss
+                    val_predictions.append(out)
+                    val_labels.append(labels)
 
-            #    val_loss_history.append(running_val_loss)
-            #    self.last_test_image_batch = images
+                val_loss_history.append(running_val_loss)
+                self.last_test_image_batch = images
 
             # Show metrics in pbar
             pbar_description = f"Epoch[{cur_epoch + 1}/{num_epochs}], Loss: {running_loss / len(self.train_dataloader):.4f}"
-            #val_metrics = self.compute_metrics(
-            #    torch.cat(val_predictions, 0), torch.cat(val_labels, 0)
-            #)
-            #val_metrics_history.append(val_metrics)
-            #for k, v in val_metrics.items():
-            #    pbar_description += f", Val {k}: {v:.4f}"
+            val_metrics = self.compute_metrics(
+                torch.cat(val_predictions, 0), torch.cat(val_labels, 0)
+            )
+            val_metrics_history.append(val_metrics)
+            for k, v in val_metrics.items():
+                pbar_description += f", Val {k}: {v:.4f}"
             pbar_epoch.set_description(pbar_description)
 
             # Save best models, hack for reducing io
-            if cur_epoch % 10 == 0 or cur_epoch < 20:
-#               best_val_loss = running_val_loss
-                self.save_model(f"snapshot{cur_epoch}")
-                self.test(f"snapshot{cur_epoch}")
+            if running_val_loss < best_val_loss:
+                best_val_loss = running_val_loss
+                self.save_model(f"best_val")
 
-            #for k, v in val_metrics.items():
-            #    self.save_model(f"best_val_{k.replace(' ', '_')}")
+            if cur_epoch % 10 == 0 and cur_epoch > 0:
+                self.test(f"best_val")
+
+            for k, v in val_metrics.items():
+                self.save_model(f"best_val_{k.replace(' ', '_')}")
 
         # Save histories as numpy arrays
         np.save(
             self.output_path / "train_loss_history.npy", np.array(train_loss_history)
         )
-        #np.save(self.output_path / "val_loss_history.npy", np.array(val_loss_history))
-        #np.save(
-        #    self.output_path / "val_metrics_history.npy", np.array(val_metrics_history)
-        #)
+        np.save(self.output_path / "val_loss_history.npy", np.array(val_loss_history))
+        np.save(
+            self.output_path / "val_metrics_history.npy", np.array(val_metrics_history)
+        )
 
         self.save_model("last")
-        #return ["last", "best_val"] + [
-        #    f"best_val_{k.replace(' ', '_')}" for k, _ in val_metrics.items()
-        #]
-        return ["last"]
+        return ["last", "best_val"] + [
+            f"best_val_{k.replace(' ', '_')}" for k, _ in val_metrics.items()
+        ]
 
     def test(self, model_tag):
         """Test the model and save the results"""
