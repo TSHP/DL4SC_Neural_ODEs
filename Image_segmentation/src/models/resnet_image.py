@@ -38,10 +38,7 @@ class ResNet6_images(nn.Module):
             ResidualBlock(w, w),
             ResidualBlock(w, w),
         )
-        self.upsample = nn.Sequential(
-                                   nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=3, padding=1),
-                                   nn.BatchNorm2d(out_channels),
-                                   nn.Sigmoid())
+        self.upsample = nn.Sequential(nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=3, padding=1))
 
     def forward(self, x):
         out = self.downsample(x)

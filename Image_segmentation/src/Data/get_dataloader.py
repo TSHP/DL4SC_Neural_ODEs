@@ -25,11 +25,9 @@ class CustomVOCDataset(Dataset):
         return image, mask
         
 def encode(x):
-    x = x.to(torch.int64)
     x[x==255] = 0
-    x = x.to(torch.float32)
+    x = torch.squeeze(x).to(torch.long)
     #x = F.one_hot(x, 21).permute(0,3,1,2).to(torch.float32)
-
     return x
 
 def get_dataloader(voc_dataset, out_size=32, batch_size=32):

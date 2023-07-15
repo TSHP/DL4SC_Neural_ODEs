@@ -64,12 +64,13 @@ def visualize_dataloader(VOC_data_loader):
 
 def visualize_results(predicts, masks):
     
+    
     predicts = torch.tensor(predicts[0])
     masks = torch.tensor(masks[0])
-    
-    #predicts = torch.argmax(predicts, dim=1, keepdim=True)
-    #masks = torch.argmax(masks, dim=1, keepdim=True)
 
+    masks = torch.unsqueeze(masks,1)
+    predicts = torch.argmax(predicts, dim=1, keepdim=True)
+    
     grid_images = make_grid(predicts)
     grid_masks = make_grid(masks)
 
