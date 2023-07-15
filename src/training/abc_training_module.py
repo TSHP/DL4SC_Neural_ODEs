@@ -91,7 +91,7 @@ class ABCTrainingModule(ABC):
             if cur_epoch % 10 and cur_epoch > 0:
 #                best_val_loss = running_val_loss
                 print("Val ")
-                self.save_model(f"snapshot{cur_epoch}_model.pt")
+                self.save_model(self.output_path / f"snapshot{cur_epoch}_model.pt")
                 self.test(f"snapshot{cur_epoch}")
 
             #for k, v in val_metrics.items():
