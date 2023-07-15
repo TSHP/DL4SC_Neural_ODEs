@@ -91,7 +91,7 @@ class ABCTrainingModule(ABC):
             pbar_epoch.set_description(pbar_description)
 
             # Save best models, hack for reducing io
-            if cur_epoch % 10 == 0 or cur_epoch < 10:
+            if cur_epoch % 10 == 0 or cur_epoch < 20:
 #               best_val_loss = running_val_loss
                 self.save_model(f"snapshot{cur_epoch}")
                 self.test(f"snapshot{cur_epoch}")
