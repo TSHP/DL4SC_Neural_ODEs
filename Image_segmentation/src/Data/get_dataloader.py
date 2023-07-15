@@ -29,7 +29,7 @@ def encode(x):
     x[x==255] = 0
     x = x.to(torch.float32)
     #x = F.one_hot(x, 21).permute(0,3,1,2).to(torch.float32)
-    x = torch.squeeze(x)
+
     return x
 
 def get_dataloader(voc_dataset, out_size=32, batch_size=32):

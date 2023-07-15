@@ -25,7 +25,7 @@ class ResNet6_images(nn.Module):
         super(ResNet6_images, self).__init__()
         w = 64
         self.downsample = nn.Sequential(
-            nn.Conv2d(in_channels=in_channels, out_channels=w, kernel_size=3, stride=1),
+            nn.Conv2d(in_channels=in_channels, out_channels=w, kernel_size=3, padding=1),
             nn.BatchNorm2d(w),
             nn.ReLU(inplace=True),
 
@@ -37,8 +37,6 @@ class ResNet6_images(nn.Module):
             ResidualBlock(w, w),#
             ResidualBlock(w, w),
             ResidualBlock(w, w),
-            ResidualBlock(w, w),
-            ResidualBlock(w, w),#
         )
         self.upsample = nn.Sequential(
                                    nn.Conv2d(in_channels=w, out_channels=out_channels, kernel_size=3, padding=1),
@@ -49,5 +47,4 @@ class ResNet6_images(nn.Module):
         out = self.downsample(x)
         out = self.residual_blocks(out)
         out = self.upsample(out)
-        out = torch.squeeze(out)
         return out
