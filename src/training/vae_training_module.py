@@ -1,28 +1,26 @@
-from tqdm import tqdm
-
 import torch
 import torchvision
 
+from src.training.utils.kl_divergence import KLDivLoss
 from src.training.abc_training_module import ABCTrainingModule
 
 
 class VAETrainingModule(ABCTrainingModule):
     def __init__(self, model, optimizer, params) -> None:
-        self.super().__init__(model, optimizer, params)
+        super().__init__(model, optimizer, params)
+        self.loss = torch.nn.MSELoss()
+        self.kl_loss = KLDivLoss()
+        self.kl_weight = params["kl_weight"]
 
     def compute_loss(self, inputs, labels):
-        return torch.sum([w * c(inputs, labels) for w, c in zip(self.get_loss_weights(), self.get_criteria())])
-    
-    def compute_metrics(self, inputs, labels):
-        return {
-            "Accuracy": self.compute_test_error(inputs, labels)
-        }
+        out, mu, log_var = self.model(inputs)
+        return out, self.loss(out, inputs) + self.kl_weight * self.kl_loss(mu, log_var)
 
-    def sample(self, num_samples: int = 10, epoch: int = 0):
-        with torch.no_grad():
-            samples = self.model.sample(num_samples)
-            samples = samples.cpu()
-            # Save as images
-            torchvision.utils.save_image(
-                samples, self.output_path / f"epoch_{epoch}_samples.png", nrow=10
-            )
+    def compute_metrics(self, predictions, labels):
+        generated = self.model.sample(10)
+        torchvision.utils.save_image(
+            generated.cpu(),
+            self.output_path / f"epoch_{self.epoch}_samples.png",
+            nrow=10,
+        )
+        return {}

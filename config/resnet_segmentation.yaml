@@ -1,20 +1,18 @@
 experiment:
-  title: ResNet for MNIST classification
-  mode: classification
+  title: ResNet for VOC segmentation
+  mode: segmentation
 
   model:
-    network_name: resnet
-    num_res_blocks: 6
+    network_name: resnet_segmentation
     kernel_size: 3
-    num_filters: [64, 64]
-    num_channels: 1
-    out_dim: 10
+    num_filters: [3, 32]
+    out_dim: 21
   
   training:
-    dataset_name: mnist
+    dataset_name: voc_segmentation
     n_epochs: 100
     batch_size: 128
-    output_path: ./io/output/resnet
+    output_path: ./io/output/resnet_segmentation
 
   optimizer:
     optimizer_name: adam

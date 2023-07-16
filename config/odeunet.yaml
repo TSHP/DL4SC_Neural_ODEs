@@ -1,0 +1,29 @@
+experiment:
+  title: U-Net implementation with ODE blocks with adjoint method for VOC segmentation
+  mode: segmentation_unet
+
+  model:
+    network_name: odeunet
+    kernel_size: 3
+    num_filters: [3, 32, 64, 128]
+    out_dim: 21
+    adjoint: True
+    rtol: 1.e-7
+    atol: 1.e-9 
+    method: dopri5
+  
+  training:
+    dataset_name: voc_segmentation
+    n_epochs: 100
+    batch_size: 128
+    output_path: ./io/output/odeunet
+
+  optimizer:
+    optimizer_name: adam
+    lr: 0.0001
+    betas: [0.9, 0.999]
+    eps: 1.e-7
+    weight_decay: 1.e-4
+    amsgrad: false
+
+  seed: 42
